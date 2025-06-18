@@ -14,7 +14,7 @@ public class PlayerMoveDemo : MonoBehaviour
     [SerializeField] private float _speed;
     [SerializeField]private LayerMask _groundLayer;
     private int _jumpCount;
-    [SerializeField]float[] _jumpForceList = new float[3];
+    [SerializeField]float[] _jumpForceList ;
 
 
     private void Start()
@@ -46,6 +46,9 @@ public class PlayerMoveDemo : MonoBehaviour
         if (_jumpCount < _jumpForceList.Length && Input.GetKeyDown(KeyCode.Space))
         {
             _jumpCount++;
+            var velo = _rigidbody.linearVelocity;
+            velo.y = 0;
+            _rigidbody.linearVelocity = velo;
             _rigidbody.AddForce(transform.up * SetJumpForce(_jumpCount), ForceMode.Impulse);
         }
     }
