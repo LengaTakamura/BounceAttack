@@ -1,50 +1,71 @@
 using System;
+using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class PlayerMoveDemo : MonoBehaviour
 {
-    private Rigidbody _rb;
+    private Rigidbody _rigidbody;
     [SerializeField]
     private float _rayCastMaxDistance;
 
     private bool _isGround;
     [SerializeField] private float _speed;
     [SerializeField]private LayerMask _groundLayer;
-    [SerializeField]private float _jumpForce;
-    void Start()
+    private int _jumpCount;
+    [SerializeField]float[] _jumpForceList = new float[3];
+
+
+    private void Start()
     {
-        _rb = GetComponent<Rigidbody>();
+        _rigidbody = GetComponent<Rigidbody>();
     }
 
     private void Update()
     {
-        _isGround = IsGround();
+        IsGround();
         Jump();
     }
 
     private void FixedUpdate()
     {
         Run();
+        Debug.Log(_rigidbody.linearVelocity);
     }
 
     void Run()
     {
-        if (!_isGround) return;
-        var input = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
-        _rb.linearVelocity = input.normalized * _speed;
+        var input = new Vector3(Input.GetAxis("Horizontal"),0, Input.GetAxis("Vertical")).normalized;
+        var velo = new Vector3(input.x * _speed, _rigidbody.linearVelocity.y, input.z * _speed);
+        _rigidbody.linearVelocity = velo;
     }
 
     void Jump()
     {
-        if (_isGround && Input.GetKeyDown(KeyCode.Space))
+        if (_jumpCount < _jumpForceList.Length && Input.GetKeyDown(KeyCode.Space))
         {
-            _rb.AddForce(transform.up * _jumpForce, ForceMode.Impulse);
+            _jumpCount++;
+            _rigidbody.AddForce(transform.up * SetJumpForce(_jumpCount), ForceMode.Impulse);
         }
     }
 
-    bool IsGround()
+    void IsGround()
     {
         var hit = Physics.Raycast(transform.position, Vector3.down,_rayCastMaxDistance, _groundLayer);
-        return hit;
+        if (hit)
+        {
+            _isGround = true;
+            _jumpCount = 0;
+        }
+        else
+        {
+            _isGround = false;
+        }
+    }
+
+    float SetJumpForce(int jumpCount)
+    {
+        return _jumpForceList[jumpCount - 1];
     }
 }
