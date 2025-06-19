@@ -59,7 +59,10 @@ public class PlayerMoveDemo : MonoBehaviour
         if (hit)
         {
             _isGround = true;
-            _jumpCount = 0;
+            if (_jumpCount >= _jumpForceList.Length)
+            {
+                _jumpCount = 0;
+            }
         }
         else
         {
