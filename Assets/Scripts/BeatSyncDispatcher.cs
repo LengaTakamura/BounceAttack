@@ -1,6 +1,6 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
+using CriWare;
 
 public class BeatSyncDispatcher : MonoBehaviour
 {
@@ -15,9 +15,9 @@ public class BeatSyncDispatcher : MonoBehaviour
             Destroy(gameObject);
             return;
         }
-
         Instance = this;
         DontDestroyOnLoad(gameObject);
+        CriAtomExBeatSync.OnCallback += ListenersOnBeat;
     }
 
     public void Register(IBeatSyncListener listener)
@@ -43,6 +43,14 @@ public class BeatSyncDispatcher : MonoBehaviour
         else
         {
             Debug.LogWarning("listener not registered");
+        }
+    }
+
+    private void ListenersOnBeat(ref CriAtomExBeatSync.Info info)
+    {
+        foreach (var listener in _listeners)
+        {
+            listener.OnBeat();
         }
     }
 }
