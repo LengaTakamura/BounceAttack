@@ -6,8 +6,6 @@ using CriWare;
 
 public class BeatActionDemo : MonoBehaviour,IBeatSyncListener
 {
-    [SerializeField]private string _cueSheetName;
-    [SerializeField]private string _acbFilePath;
     [SerializeField] private string _bgmCueName;
     private CriAtomExAcb _criAtomExAcb;
     private CriAtomExPlayer _atomExPlayer;
@@ -18,31 +16,20 @@ public class BeatActionDemo : MonoBehaviour,IBeatSyncListener
     public bool IsBeating { get; set; }
 
     [SerializeField] private GameObject _prefab;
+    [SerializeField]private CriAtomSource _source;
     private void Start()
     {
-        Init().Forget();
+        Init();
         PlayBgm(_bgmCueName);
     }
-    private async UniTaskVoid Init()
+    private void Init()
     {
         _cts = new CancellationTokenSource();
-
-        _atomExPlayer = new CriAtomExPlayer();
-
-        // キューシートの追加
-        var cueSheet = CriAtom.AddCueSheet(_cueSheetName, _acbFilePath, "");
-
-        // 非同期でロード完了を待つ
-        await UniTask.WaitUntil(() => !cueSheet.IsLoading, cancellationToken: _cts.Token);
-
-        _criAtomExAcb = cueSheet.acb;
     }
     
     private void PlayBgm(string bgmCueName)
     {
-        if (!_criAtomExAcb.Exists(bgmCueName)) return;
-        _atomExPlayer.SetCue(_criAtomExAcb, bgmCueName);
-        _atomExPlayer.Start();
+        _source.Play(bgmCueName);
     }
     
     private void OnDestroy()
