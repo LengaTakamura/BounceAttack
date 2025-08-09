@@ -21,6 +21,7 @@ public class BeatActionDemo : MonoBehaviour,IBeatSyncListener
     {
         Init();
         PlayBgm(_bgmCueName);
+        BeatSyncDispatcher.Instance.Register(this);
     }
     private void Init()
     {
@@ -37,12 +38,7 @@ public class BeatActionDemo : MonoBehaviour,IBeatSyncListener
         _cts?.Cancel();
         _cts?.Dispose();
     }
-
-    private void OnEnable()
-    {
-       BeatSyncDispatcher.Instance.Register(this);
-    }
-
+    
     private void OnDisable()
     {
         BeatSyncDispatcher.Instance.Unregister(this);
