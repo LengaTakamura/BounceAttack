@@ -7,7 +7,7 @@ public class BeatSyncDispatcher : MonoBehaviour
     private readonly List<IBeatSyncListener> _listeners = new();
 
     public static BeatSyncDispatcher Instance;
-
+    
     private void Awake()
     {
         if (Instance != null)
@@ -50,7 +50,7 @@ public class BeatSyncDispatcher : MonoBehaviour
     {
         foreach (var listener in _listeners)
         {
-            listener.OnBeat();
+            listener.OnBeat(ref info);
         }
     }
 }

@@ -41,7 +41,6 @@ public class PlayerMoveDemo : MonoBehaviour
     private void FixedUpdate()
     {
         Run();
-        Debug.Log(_rigidbody.linearVelocity);
     }
 
     void Run()
