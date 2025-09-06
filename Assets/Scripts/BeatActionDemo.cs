@@ -6,7 +6,7 @@ using Cysharp.Threading.Tasks;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
-public class BeatActionDemo : MonoBehaviour,IBeatSyncListener
+public class BeatActionDemo : MonoBehaviour, IBeatSyncListener
 {
     [SerializeField] private string _bgmCueName;
     private CriAtomExAcb _criAtomExAcb;
@@ -18,8 +18,8 @@ public class BeatActionDemo : MonoBehaviour,IBeatSyncListener
     public bool IsBeating { get; set; }
 
     [SerializeField] private GameObject _prefab;
-    [SerializeField]private CriAtomSource _source;
-    private CriAtomExPlayback _playback;
+    [SerializeField] private CriAtomSource _source;
+    public static CriAtomExPlayback BGMPlayback;
     [SerializeField] private Image _image;
     private float _second;
     private float _nextBeatTime;
@@ -28,34 +28,35 @@ public class BeatActionDemo : MonoBehaviour,IBeatSyncListener
     private float _diff;
     private CriAtomExBeatSync.Info _info;
     private float _prevBeatTime;
+
     private void Start()
     {
         Init();
         PlayBgm(_bgmCueName);
         BeatSyncDispatcher.Instance.Register(this);
-
     }
+
     private void Init()
     {
         _cts = new CancellationTokenSource();
         _cts2 = new CancellationTokenSource();
     }
-    
+
     private void PlayBgm(string bgmCueName)
     {
-       _playback = _source.Play(bgmCueName);
-       if (_playback.GetBeatSyncInfo(out CriAtomExBeatSync.Info info))
-       {
-           _info = info;
-       }
+        BGMPlayback = _source.Play(bgmCueName);
+        if (BGMPlayback.GetBeatSyncInfo(out CriAtomExBeatSync.Info info))
+        {
+            _info = info;
+        }
     }
-    
+
     private void OnDestroy()
     {
         _cts?.Dispose();
         _cts2?.Dispose();
     }
-    
+
     private void OnDisable()
     {
         BeatSyncDispatcher.Instance.Unregister(this);
@@ -66,32 +67,33 @@ public class BeatActionDemo : MonoBehaviour,IBeatSyncListener
         _count++;
         if (_count % 2 == 0)
         {
-            Debug.Log("OnBeat");
+           // Debug.Log("OnBeat");
         }
         //Instantiate(_prefab, transform);
-        
-        var nowTime = _playback.GetTime() / 1000f;
+
+        var nowTime = BGMPlayback.GetTime() / 1000f;
         float secondsPerBeat = 60f / info.bpm / 2;
         _prevBeatTime = nowTime;
         _nextBeatTime = nowTime + secondsPerBeat;
     }
 
 
-    
     private void Update()
     {
         ActionB();
     }
+
     private void ActionB()
     {
         if (!Input.GetKeyDown(KeyCode.B)) return;
-        if (_playback.GetBeatSyncInfo(out CriAtomExBeatSync.Info info))
+        if (BGMPlayback.status != CriAtomExPlayback.Status.Playing) return;
+        if (BGMPlayback.GetBeatSyncInfo(out CriAtomExBeatSync.Info info))
         {
-            var nowTime = _playback.GetTime() / 1000f;
+            var nowTime = BGMPlayback.GetTime() / 1000f;
             float secondsPerBeat = 60f / info.bpm / 2;
             float diffPrev = Mathf.Abs(nowTime - _prevBeatTime);
             float diffNext = Mathf.Abs(nowTime - _nextBeatTime);
-            var diff = Mathf.Min(diffPrev,diffNext);
+            var diff = Mathf.Min(diffPrev, diffNext);
             var greatDiff = secondsPerBeat * 0.2f;
             var goodDiff = secondsPerBeat * 0.4f;
             if (diff < greatDiff)
@@ -100,7 +102,7 @@ public class BeatActionDemo : MonoBehaviour,IBeatSyncListener
                 var obj = Instantiate(_prefab, transform.position, Quaternion.identity);
                 var random = Random.Range(-1f, 1f);
                 var random2 = Random.Range(-1f, 1f);
-                obj.GetComponent<Rigidbody>().AddForce(new Vector3(random,random2,1) * 10, ForceMode.Impulse);
+                obj.GetComponent<Rigidbody>().AddForce(new Vector3(random, random2, 1) * 10, ForceMode.Impulse);
             }
             else if (diff < goodDiff)
             {
@@ -111,24 +113,55 @@ public class BeatActionDemo : MonoBehaviour,IBeatSyncListener
                 Debug.Log("Bad" + diff);
             }
         }
-       
     }
+
+    public static BeatActionType JudgeBeatAction(CriAtomExPlayback playback, float prevBeatTime, float nextBeatTime)
+    {
+        if (playback.GetBeatSyncInfo(out CriAtomExBeatSync.Info info))
+        {
+            var nowTime = playback.GetTime() / 1000f;
+            float secondsPerBeat = 60f / info.bpm / 2;
+            float diffPrev = Mathf.Abs(nowTime - prevBeatTime);
+            float diffNext = Mathf.Abs(nowTime - nextBeatTime);
+            var diff = Mathf.Min(diffPrev, diffNext);
+            var greatDiff = secondsPerBeat * 0.2f;
+            var goodDiff = secondsPerBeat * 0.4f;
+            if (diff < greatDiff)
+            {
+                return BeatActionType.Great;
+            }
+
+            if (diff < goodDiff)
+            {
+                return BeatActionType.Good;
+            }
+
+            return BeatActionType.Bad;
+        }
+
+        Debug.Log("PlayBackが取得できません");
+        return BeatActionType.None;
+    }
+
+   
 }
+
 
 public enum BeatActionType
 {
-    Bad,Good,Great
+    Bad,
+    Good,
+    Great,
+    None
 }
 
 public interface IBeatSyncListener
 {
     void OnBeat(ref CriAtomExBeatSync.Info info);
-    
-    int CurrentBpm { get; set;}
-    
-    int DiffBpm { get; set;}
-    
-    bool IsBeating { get; set;}
-    
-    
+
+    int CurrentBpm { get; set; }
+
+    int DiffBpm { get; set; }
+
+    bool IsBeating { get; set; }
 }
