@@ -24,6 +24,10 @@ public class BeatActionDemo : MonoBehaviour,IBeatSyncListener
     private float _second;
     private float _nextBeatTime;
     private CancellationTokenSource _cts2;
+    private int _count;
+    private float _diff;
+    private CriAtomExBeatSync.Info _info;
+    private float _prevBeatTime;
     private void Start()
     {
         Init();
@@ -40,6 +44,10 @@ public class BeatActionDemo : MonoBehaviour,IBeatSyncListener
     private void PlayBgm(string bgmCueName)
     {
        _playback = _source.Play(bgmCueName);
+       if (_playback.GetBeatSyncInfo(out CriAtomExBeatSync.Info info))
+       {
+           _info = info;
+       }
     }
     
     private void OnDestroy()
@@ -55,12 +63,17 @@ public class BeatActionDemo : MonoBehaviour,IBeatSyncListener
 
     public void OnBeat(ref CriAtomExBeatSync.Info info)
     {
-        Debug.Log("OnBeat");
+        _count++;
+        if (_count % 2 == 0)
+        {
+            Debug.Log("OnBeat");
+        }
         //Instantiate(_prefab, transform);
-        _second = 60f / info.bpm;
         
-        var nowTime = _playback.GetTimeSyncedWithAudio() / 1000f;
-        _nextBeatTime = nowTime + _second * (1f - info.beatProgress);
+        var nowTime = _playback.GetTime() / 1000f;
+        float secondsPerBeat = 60f / info.bpm / 2;
+        _prevBeatTime = nowTime;
+        _nextBeatTime = nowTime + secondsPerBeat;
     }
 
 
@@ -69,31 +82,42 @@ public class BeatActionDemo : MonoBehaviour,IBeatSyncListener
     {
         ActionB();
     }
-
-
     private void ActionB()
     {
-        if (!Input.GetKeyDown(KeyCode.B) || !_playback.GetBeatSyncInfo(out CriAtomExBeatSync.Info info)) return;
-        float progress = info.beatProgress; 
-        float bpm = info.bpm;
-        float secondsPerBeat = 60f / bpm;
-        if (progress < 0.1f || progress > 0.9f)
+        if (!Input.GetKeyDown(KeyCode.B)) return;
+        if (_playback.GetBeatSyncInfo(out CriAtomExBeatSync.Info info))
         {
-            Debug.Log("Great");
-            var obj = Instantiate(_prefab, transform.position, Quaternion.identity);
-            var random = Random.Range(-1f, 1f);
-            var random2 = Random.Range(-1f, 1f);
-            obj.GetComponent<Rigidbody>().AddForce(new Vector3(random,random2,1) * 10, ForceMode.Impulse);
+            var nowTime = _playback.GetTime() / 1000f;
+            float secondsPerBeat = 60f / info.bpm / 2;
+            float diffPrev = Mathf.Abs(nowTime - _prevBeatTime);
+            float diffNext = Mathf.Abs(nowTime - _nextBeatTime);
+            var diff = Mathf.Min(diffPrev,diffNext);
+            var greatDiff = secondsPerBeat * 0.2f;
+            var goodDiff = secondsPerBeat * 0.4f;
+            if (diff < greatDiff)
+            {
+                Debug.Log("Great" + diff);
+                var obj = Instantiate(_prefab, transform.position, Quaternion.identity);
+                var random = Random.Range(-1f, 1f);
+                var random2 = Random.Range(-1f, 1f);
+                obj.GetComponent<Rigidbody>().AddForce(new Vector3(random,random2,1) * 10, ForceMode.Impulse);
+            }
+            else if (diff < goodDiff)
+            {
+                Debug.Log("Good" + diff);
+            }
+            else
+            {
+                Debug.Log("Bad" + diff);
+            }
         }
-        else if (progress < 0.3f || progress > 0.7f)
-        {
-            Debug.Log("Good");
-        }
-        else
-        {
-            Debug.Log("Bad");
-        }
+       
     }
+}
+
+public enum BeatActionType
+{
+    Bad,Good,Great
 }
 
 public interface IBeatSyncListener
