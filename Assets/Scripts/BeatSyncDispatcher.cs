@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 using CriWare;
 
@@ -52,5 +53,23 @@ public class BeatSyncDispatcher : MonoBehaviour
         {
             listener.OnBeat(ref info);
         }
+    }
+    
+    public float BeforeOnBeat(CriAtomExPlayback playback, float preparationTime, int beatNum)
+    {
+        if (playback.GetBeatSyncInfo(out CriAtomExBeatSync.Info info))
+        {
+            var nowTime = playback.GetTime() / 1000f;
+            float secondsPerBeat = 60f / info.bpm / 2;
+            var targetTime = secondsPerBeat * beatNum;
+            var startTime = targetTime - preparationTime;
+            var waitTime = startTime - nowTime;
+            if (waitTime > 0) return waitTime;
+            Debug.Log("指定した拍は過ぎています");
+            return 0;
+        }
+
+        Debug.Log("playbackが情報を取得できませんでした");
+        return 0;
     }
 }
