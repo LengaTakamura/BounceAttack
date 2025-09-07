@@ -12,6 +12,7 @@ public class BeatScaleDemo : MonoBehaviour,IBeatSyncListener
     public bool IsBeating { get; set; }
     private int _count;
     [SerializeField] private GameObject _prefab;
+    [SerializeField] private GameObject _effectPrefab;
     void Start()
     {
         BeatSyncDispatcher.Instance.Register(this);
@@ -29,10 +30,9 @@ public class BeatScaleDemo : MonoBehaviour,IBeatSyncListener
         {
             gameObject.transform.DOScale(new Vector3(3f, 3f, 3f), 0.5f).OnComplete(OnComp);
         }
-
         if (_count == 4)
         {
-            var waitTime =  BeatSyncDispatcher.Instance.BeforeOnBeat(BeatActionDemo.BGMPlayback, 2, 50);
+            var waitTime =  BeatSystem.Instance.BeforeOnBeat(BeatActionDemo.BGMPlayback, 2, 50);
             Debug.Log(waitTime);
             PrefabBigger(waitTime).Forget();
         }
@@ -46,6 +46,7 @@ public class BeatScaleDemo : MonoBehaviour,IBeatSyncListener
         cts.Cancel();
         cts.Dispose();
         obj.gameObject.SetActive(false);
+        Instantiate(_effectPrefab);
         Debug.Log("OnBeat!!!!!!!!!!!");
     }
 

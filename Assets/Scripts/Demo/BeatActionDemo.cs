@@ -67,14 +67,12 @@ public class BeatActionDemo : MonoBehaviour, IBeatSyncListener
         _count++;
         if (_count % 2 == 0)
         {
-           // Debug.Log("OnBeat");
+            var nowTime = BGMPlayback.GetTime() / 1000f;
+            float secondsPerBeat = 60f / info.bpm / 2;
+            _prevBeatTime = nowTime;
+            _nextBeatTime = nowTime + secondsPerBeat;
         }
-        //Instantiate(_prefab, transform);
-
-        var nowTime = BGMPlayback.GetTime() / 1000f;
-        float secondsPerBeat = 60f / info.bpm / 2;
-        _prevBeatTime = nowTime;
-        _nextBeatTime = nowTime + secondsPerBeat;
+      
     }
 
 
@@ -114,54 +112,6 @@ public class BeatActionDemo : MonoBehaviour, IBeatSyncListener
             }
         }
     }
-
-    public static BeatActionType JudgeBeatAction(CriAtomExPlayback playback, float prevBeatTime, float nextBeatTime)
-    {
-        if (playback.GetBeatSyncInfo(out CriAtomExBeatSync.Info info))
-        {
-            var nowTime = playback.GetTime() / 1000f;
-            float secondsPerBeat = 60f / info.bpm / 2;
-            float diffPrev = Mathf.Abs(nowTime - prevBeatTime);
-            float diffNext = Mathf.Abs(nowTime - nextBeatTime);
-            var diff = Mathf.Min(diffPrev, diffNext);
-            var greatDiff = secondsPerBeat * 0.2f;
-            var goodDiff = secondsPerBeat * 0.4f;
-            if (diff < greatDiff)
-            {
-                return BeatActionType.Great;
-            }
-
-            if (diff < goodDiff)
-            {
-                return BeatActionType.Good;
-            }
-
-            return BeatActionType.Bad;
-        }
-
-        Debug.Log("PlayBackが取得できません");
-        return BeatActionType.None;
-    }
-
-   
 }
 
 
-public enum BeatActionType
-{
-    Bad,
-    Good,
-    Great,
-    None
-}
-
-public interface IBeatSyncListener
-{
-    void OnBeat(ref CriAtomExBeatSync.Info info);
-
-    int CurrentBpm { get; set; }
-
-    int DiffBpm { get; set; }
-
-    bool IsBeating { get; set; }
-}
