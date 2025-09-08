@@ -2,7 +2,7 @@ using System;
 using CriWare;
 using UnityEngine;
 
-public class EnemyBase : MonoBehaviour,IBeatSyncListener,IDamageable
+public class EnemyBase : MonoBehaviour,IBeatSyncListener
 {
     public int CurrentBpm { get; set; }
     public int DiffBpm { get; set; }
@@ -10,33 +10,24 @@ public class EnemyBase : MonoBehaviour,IBeatSyncListener,IDamageable
     public float MaxHealth { get; set; }
     public float CurrentHealth { get; set; }
     public float AttackPower { get; set; }
-    
-    public Action OnDeath {get ; set ;}
+    [SerializeField] private float _score;
 
-    public void OnBeat(ref CriAtomExBeatSync.Info info)
+    private Action _onDeath;
+
+    public virtual void OnBeat(ref CriAtomExBeatSync.Info info)
     {
         
     }
 
     public void InitOnPool(Action release)
     {
-        OnDeath += release;
+        _onDeath += release;
     }
-
     
-    public void HitDamage(float damage)
+    public virtual float Kill()
     {
-        
-    }
-
-    public void HitHeal(float value)
-    {
-       
-    }
-
-    public void Kill()
-    {
-        OnDeath?.Invoke();
+        _onDeath?.Invoke();
+        return _score;
     }
     
 }
