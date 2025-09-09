@@ -8,6 +8,7 @@ using Random = UnityEngine.Random;
 
 public class BeatActionDemo : MonoBehaviour, IBeatSyncListener
 {
+    [SerializeField] private Text _text;
     [SerializeField] private string _bgmCueName;
     private CriAtomExAcb _criAtomExAcb;
     private CriAtomExPlayer _atomExPlayer;
@@ -96,7 +97,7 @@ public class BeatActionDemo : MonoBehaviour, IBeatSyncListener
             var goodDiff = secondsPerBeat * 0.4f;
             if (diff < greatDiff)
             {
-                Debug.Log("Great" + diff);
+                _text.text = "Great : 誤差" + diff.ToString("F2");
                 var obj = Instantiate(_prefab, transform.position, Quaternion.identity);
                 var random = Random.Range(-1f, 1f);
                 var random2 = Random.Range(-1f, 1f);
@@ -104,11 +105,11 @@ public class BeatActionDemo : MonoBehaviour, IBeatSyncListener
             }
             else if (diff < goodDiff)
             {
-                Debug.Log("Good" + diff);
+                _text.text = "Good : 誤差" + diff.ToString("F2");
             }
             else
             {
-                Debug.Log("Bad" + diff);
+                _text.text = "Bad : 誤差" + diff.ToString("F2");
             }
         }
     }
