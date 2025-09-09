@@ -1,5 +1,6 @@
 using System;
 using CriWare;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 public class BeatSystem : MonoBehaviour, IBeatSyncListener
@@ -13,6 +14,10 @@ public class BeatSystem : MonoBehaviour, IBeatSyncListener
     private CriAtomExPlayback _playback;
 
     public Action<BeatInfo> OnBeatAction {get; set; }
+
+    private int _count;
+
+    private float _prevTime;
     
     private void Awake()
     {
@@ -21,11 +26,13 @@ public class BeatSystem : MonoBehaviour, IBeatSyncListener
 
     private void Start()
     {
-        Init();
+        Init().Forget();
+        _count = -1;
     }
 
-    private void Init()
+    private async UniTaskVoid Init()
     {
+        await UniTask.Delay(TimeSpan.FromSeconds(5f));
         _playback = _soundManager.PlayBgm();
         if (!_playback.GetBeatSyncInfo(out CriAtomExBeatSync.Info info))
         {
@@ -35,16 +42,19 @@ public class BeatSystem : MonoBehaviour, IBeatSyncListener
 
     public void OnBeat(ref CriAtomExBeatSync.Info info)
     {
-        OnBeatAction?.Invoke(UpdateInfo(info));
+        var beatInfo = UpdateInfo(info);
+        OnBeatAction?.Invoke(beatInfo);
     }
     private BeatInfo UpdateInfo(CriAtomExBeatSync.Info info)
     {
+        _count++;
         var copy = new BeatInfo
         {
             Bpm = info.bpm,
             SecondsPerBeat = 60f / info.bpm,
-            BeatCount = info.beatCount + 1,
-            NowTime = _playback.GetTime() / 1000f
+            BeatCount = info.beatCount,
+            CurrentBeat = _count,
+            NowTime = (ulong)_playback.GetTime() / (ulong)1000f
         };
         return copy;
     }
@@ -59,5 +69,6 @@ public struct BeatInfo
     public float Bpm;
     public float SecondsPerBeat;
     public float BeatCount;
-    public float NowTime;
+    public float CurrentBeat;
+    public ulong NowTime;
 }
