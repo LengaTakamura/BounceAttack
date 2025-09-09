@@ -42,7 +42,7 @@ public class BeatSystem : MonoBehaviour, IBeatSyncListener
         var copy = new BeatInfo
         {
             Bpm = info.bpm,
-            SecondsPerBeat = 60f / info.bpm / 2,
+            SecondsPerBeat = 60f / info.bpm,
             BeatCount = info.beatCount + 1,
             NowTime = _playback.GetTime() / 1000f
         };
