@@ -32,9 +32,9 @@ public class BeatScaleDemo : MonoBehaviour,IBeatSyncListener
         }
         if (_count == 4)
         {
-            var waitTime =  BeatSystem.Instance.BeforeOnBeat(BeatActionDemo.BGMPlayback, 2, 50);
-            Debug.Log(waitTime);
-            PrefabBigger(waitTime).Forget();
+            //var waitTime =  BeatSystem.Instance.BeforeOnBeat(BeatActionDemo.BGMPlayback, 2, 50);
+            //Debug.Log(waitTime);
+            //PrefabBigger(waitTime).Forget();
         }
     }
 
@@ -54,6 +54,5 @@ public class BeatScaleDemo : MonoBehaviour,IBeatSyncListener
     {
         gameObject.transform.DOScale(new Vector3(1f, 1f, 1f), 0.5f);
     }
-
-
+    
 }

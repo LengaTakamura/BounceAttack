@@ -1002,14 +1002,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 060e0c95dde0ae744b7096804c5a5698, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _enemyList: []
+  _enemyList:
+  - {fileID: -1892901875107988819, guid: 2c62bfa740831204284ddee8f9878a89, type: 3}
+  - {fileID: -3765001036071810124, guid: 96d2359f16206524b8f4cda026b61fd7, type: 3}
+  - {fileID: 438905847851700761, guid: e3af95dda8d70484089545a2b2cefe4a, type: 3}
   _spawnPoints:
   - {fileID: 1557476623}
   - {fileID: 142463421}
   - {fileID: 416402676}
   - {fileID: 1302690101}
-  _defaultSize: 10
-  _maxSize: 30
+  _defaultSize: 30
+  _maxSize: 100
 --- !u!1 &1997912419
 GameObject:
   m_ObjectHideFlags: 0

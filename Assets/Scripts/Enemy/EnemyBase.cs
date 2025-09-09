@@ -1,30 +1,40 @@
 using System;
+using System.Threading;
 using CriWare;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 public class EnemyBase : MonoBehaviour
 {
-    public int CurrentBpm { get; set; }
-    public int DiffBpm { get; set; }
-    public bool IsBeating { get; set; }
     [SerializeField] private float _score;
 
     private Action _onDeath;
 
-    private BeatInfo _beatInfo;
+    protected BeatInfo BeatInfo;
     
+    private float _timer;
     void Awake()
     {
     }
-    
-    private void OnDisable()
-    {
 
-    }
-    
-    public void UpdateInfo(BeatInfo info)
+    private async void Start()
     {
-        _beatInfo = info;
+        var cts = new CancellationTokenSource();
+        await UniTask.Delay(TimeSpan.FromSeconds(10f),cancellationToken: cts.Token);
+        Kill();
+        cts.Cancel();
+        cts.Dispose();
+    }
+
+
+    private void Update()
+    {
+       
+    }
+
+    public virtual void EnemyOnBeat(BeatInfo info)
+    {
+        BeatInfo = info;
     }
 
     public void InitOnPool(Action release)
@@ -35,6 +45,7 @@ public class EnemyBase : MonoBehaviour
     public virtual float Kill()
     {
         _onDeath?.Invoke();
+        _onDeath = null;
         return _score;
     }
     
