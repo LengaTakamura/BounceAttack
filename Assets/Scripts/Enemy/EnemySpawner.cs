@@ -7,41 +7,23 @@ using UnityEngine;
 using UnityEngine.Pool;
 using Random = UnityEngine.Random;
 
-public class EnemySpawner : MonoBehaviour,IBeatSyncListener
+public class EnemySpawner : MonoBehaviour, IBeatSyncListener
 {
     [SerializeField] private List<EnemyBase> _enemyList;
     [SerializeField] private List<Transform> _spawnPoints;
     private ObjectPool<EnemyBase> _pool;
     [SerializeField] private int _defaultSize;
     [SerializeField] private int _maxSize;
-    private Action<BeatInfo> _onBeatAction; 
+    private Action<BeatInfo> _onBeatAction;
     private BeatInfo _beatInfo;
     private BeatSystem _beatSystem;
+
     private void Start()
     {
         BeatSyncDispatcher.Instance.Register(this);
         _beatSystem = BeatSyncDispatcher.Instance.Get<BeatSystem>();
         _beatSystem.OnBeatAction += UpdateSpawnerInfo;
         Init();
-        DebugWave().Forget();
-    }
-
-    private async UniTaskVoid DebugWave()
-    {
-        var cts = new CancellationTokenSource();
-        int count = 0;
-        while (count < 50)
-        {
-            count++;
-            var random = UnityEngine.Random.Range(0, 10);
-            for (int i = 0; i < random; i++)
-            {
-                _pool.Get();
-            }
-            await UniTask.Delay(TimeSpan.FromSeconds(3f), cancellationToken: cts.Token);
-        }
-        cts.Cancel();
-        cts.Dispose();
     }
 
     private void Init()
@@ -55,12 +37,6 @@ public class EnemySpawner : MonoBehaviour,IBeatSyncListener
             defaultCapacity: _defaultSize,
             maxSize: _maxSize
         );
-
-        for (int i = 0; i < _defaultSize; i++)
-        {
-            var e =  _pool.Get();
-            ReleaseEnemy(e);
-        }
     }
 
     private void DestroyEnemy(EnemyBase enemyBase)
@@ -76,18 +52,18 @@ public class EnemySpawner : MonoBehaviour,IBeatSyncListener
 
     private void GetEnemy(EnemyBase enemyBase)
     {
-        Debug.Log(enemyBase);
         enemyBase.gameObject.SetActive(true);
-        var random = Random.Range(0,_spawnPoints.Count);
+        var random = Random.Range(0, _spawnPoints.Count);
         enemyBase.transform.position = _spawnPoints[random].position;
         enemyBase.transform.rotation = _spawnPoints[random].rotation;
         enemyBase.InitOnPool(() => _pool.Release(enemyBase));
         _onBeatAction += enemyBase.EnemyOnBeat;
+        enemyBase.Init(_beatInfo);
     }
 
     private EnemyBase InstantiatedEnemy()
     {
-        var enemyIndex = Random.Range(0,_enemyList.Count);
+        var enemyIndex = Random.Range(0, _enemyList.Count);
         var obj = Instantiate(_enemyList[enemyIndex]);
         return obj;
     }
@@ -100,10 +76,26 @@ public class EnemySpawner : MonoBehaviour,IBeatSyncListener
     public void OnBeat(ref CriAtomExBeatSync.Info info)
     {
         _onBeatAction?.Invoke(_beatInfo);
+        if ((int)_beatInfo.BeatCount % 3 == 0)
+        {
+            if(_beatInfo.CurrentBeat < 10) return;
+            DebugWave();
+        }
     }
+
+    private void DebugWave()
+    {
+        var random = Random.Range(0, 10);
+        for (int i = 0; i < random; i++)
+        {
+            _pool.Get();
+        }
+    }
+
 
     private void OnDestroy()
     {
         BeatSyncDispatcher.Instance.Unregister(this);
     }
 }
+    

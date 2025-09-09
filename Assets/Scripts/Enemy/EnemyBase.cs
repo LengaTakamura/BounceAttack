@@ -1,7 +1,4 @@
 using System;
-using System.Threading;
-using CriWare;
-using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 public class EnemyBase : MonoBehaviour
@@ -13,19 +10,11 @@ public class EnemyBase : MonoBehaviour
     protected BeatInfo BeatInfo;
     
     private float _timer;
+    
     void Awake()
     {
     }
-
-    private async void Start()
-    {
-        var cts = new CancellationTokenSource();
-        await UniTask.Delay(TimeSpan.FromSeconds(10f),cancellationToken: cts.Token);
-        Kill();
-        cts.Cancel();
-        cts.Dispose();
-    }
-
+    
 
     private void Update()
     {
@@ -35,6 +24,11 @@ public class EnemyBase : MonoBehaviour
     public virtual void EnemyOnBeat(BeatInfo info)
     {
         BeatInfo = info;
+    }
+
+    public virtual void Init(BeatInfo beatinfo)
+    {
+        BeatInfo = beatinfo;
     }
 
     public void InitOnPool(Action release)
