@@ -7,24 +7,15 @@ public class BeatSystem : MonoBehaviour, IBeatSyncListener
     public int CurrentBpm { get; set; }
     public int DiffBpm { get; set; }
     public bool IsBeating { get; set; }
-
-    public static BeatSystem Instance;
     
     [SerializeField]private SoundManager _soundManager;
     
-    public CriAtomExPlayback Playback;
+    private CriAtomExPlayback _playback;
 
-    public CriAtomExBeatSync.Info BgmInfo;
+    public Action<BeatInfo> OnBeatAction {get; set; }
+    
     private void Awake()
     {
-        if (Instance != null)
-        {
-            Destroy(gameObject);
-            return;
-        }
-
-        Instance = this;
-        DontDestroyOnLoad(gameObject);
         BeatSyncDispatcher.Instance.Register(this);
     }
 
@@ -35,12 +26,8 @@ public class BeatSystem : MonoBehaviour, IBeatSyncListener
 
     private void Init()
     {
-        Playback = _soundManager.PlayBgm();
-        if (Playback.GetBeatSyncInfo(out CriAtomExBeatSync.Info info))
-        {
-            BgmInfo = info;
-        }
-        else
+        _playback = _soundManager.PlayBgm();
+        if (!_playback.GetBeatSyncInfo(out CriAtomExBeatSync.Info info))
         {
             Debug.LogWarning("PlayBackから情報を取得できません");
         }
@@ -48,52 +35,18 @@ public class BeatSystem : MonoBehaviour, IBeatSyncListener
 
     public void OnBeat(ref CriAtomExBeatSync.Info info)
     {
+        OnBeatAction?.Invoke(UpdateInfo(info));
     }
-
-    public BeatActionType JudgeBeatAction(CriAtomExPlayback playback, float prevBeatTime, float nextBeatTime)
+    private BeatInfo UpdateInfo(CriAtomExBeatSync.Info info)
     {
-        if (playback.GetBeatSyncInfo(out CriAtomExBeatSync.Info info))
+        var copy = new BeatInfo
         {
-            var nowTime = playback.GetTime() / 1000f;
-            float secondsPerBeat = 60f / info.bpm / 2;
-            float diffPrev = Mathf.Abs(nowTime - prevBeatTime);
-            float diffNext = Mathf.Abs(nowTime - nextBeatTime);
-            var diff = Mathf.Min(diffPrev, diffNext);
-            var greatDiff = secondsPerBeat * 0.2f;
-            var goodDiff = secondsPerBeat * 0.4f;
-            if (diff < greatDiff)
-            {
-                return BeatActionType.Great;
-            }
-
-            if (diff < goodDiff)
-            {
-                return BeatActionType.Good;
-            }
-
-            return BeatActionType.Bad;
-        }
-
-        Debug.Log("PlayBackが取得できません");
-        return BeatActionType.None;
-    }
-    
-    public float BeforeOnBeat(CriAtomExPlayback playback, float preparationTime, int beatNum)
-    {
-        if (playback.GetBeatSyncInfo(out CriAtomExBeatSync.Info info))
-        {
-            var nowTime = playback.GetTime() / 1000f;
-            float secondsPerBeat = 60f / info.bpm / 2;
-            var targetTime = secondsPerBeat * beatNum;
-            var startTime = targetTime - preparationTime;
-            var waitTime = startTime - nowTime;
-            if (waitTime > 0) return waitTime;
-            Debug.Log("指定した拍は過ぎています");
-            return 0;
-        }
-
-        Debug.Log("playbackが情報を取得できませんでした");
-        return 0;
+            Bpm = info.bpm,
+            SecondsPerBeat = 60f / info.bpm / 2,
+            BeatCount = info.beatCount + 1,
+            NowTime = _playback.GetTime() / 1000f
+        };
+        return copy;
     }
     
     private void OnDisable()
@@ -101,11 +54,10 @@ public class BeatSystem : MonoBehaviour, IBeatSyncListener
         BeatSyncDispatcher.Instance.Unregister(this);
     }
 }
-
-public enum BeatActionType
+public struct BeatInfo
 {
-    Bad,
-    Good,
-    Great,
-    None
+    public float Bpm;
+    public float SecondsPerBeat;
+    public float BeatCount;
+    public float NowTime;
 }
