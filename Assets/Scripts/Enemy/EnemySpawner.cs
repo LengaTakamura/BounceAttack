@@ -1,16 +1,25 @@
+using System;
 using System.Collections.Generic;
+using CriWare;
 using UnityEngine;
 using UnityEngine.Pool;
+using Random = UnityEngine.Random;
 
-public class EnemySpawner : MonoBehaviour
+public class EnemySpawner : MonoBehaviour,IBeatSyncListener
 {
     [SerializeField] private List<EnemyBase> _enemyList;
     [SerializeField] private List<Transform> _spawnPoints;
     private ObjectPool<EnemyBase> _pool;
     [SerializeField] private int _defaultSize;
     [SerializeField] private int _maxSize;
-    private void Awake()
+    private Action<BeatInfo> _onBeatAction; 
+    private BeatInfo _beatInfo;
+    private BeatSystem _beatSystem;
+    private void Start()
     {
+        BeatSyncDispatcher.Instance.Register(this);
+        _beatSystem = BeatSyncDispatcher.Instance.Get<BeatSystem>();
+        _beatSystem.OnBeatAction += UpdateSpawnerInfo;
         Init();
     }
 
@@ -34,6 +43,7 @@ public class EnemySpawner : MonoBehaviour
 
     private void ReleaseEnemy(EnemyBase enemyBase)
     {
+        _onBeatAction += enemyBase.UpdateInfo;
         enemyBase.gameObject.SetActive(false);
     }
 
@@ -44,6 +54,7 @@ public class EnemySpawner : MonoBehaviour
         enemyBase.transform.rotation = _spawnPoints[random].rotation;
         enemyBase.gameObject.SetActive(true);
         enemyBase.InitOnPool(() => _pool.Release(enemyBase));
+        _onBeatAction += enemyBase.UpdateInfo;
     }
 
     private EnemyBase InstantiatedEnemy()
@@ -52,5 +63,20 @@ public class EnemySpawner : MonoBehaviour
         var obj = Instantiate(_enemyList[enemyIndex]);
         obj.gameObject.SetActive(false);
         return obj;
+    }
+
+    private void UpdateSpawnerInfo(BeatInfo beatInfo)
+    {
+        _beatInfo = beatInfo;
+    }
+
+    public void OnBeat(ref CriAtomExBeatSync.Info info)
+    {
+        _onBeatAction?.Invoke(_beatInfo);
+    }
+
+    private void OnDestroy()
+    {
+        BeatSyncDispatcher.Instance.Unregister(this);
     }
 }
