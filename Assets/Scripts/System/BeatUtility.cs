@@ -1,55 +1,41 @@
-using CriWare;
+using System;
 using UnityEngine;
 
-public static class BeatUtility 
+public static class BeatUtility
 {
-    public static BeatActionType JudgeBeatAction(CriAtomExPlayback playback, float prevBeatTime, float nextBeatTime)
+    public static BeatActionType JudgeBeatAction(BeatInfo info, float prevBeatTime, float nextBeatTime,
+        int beatDivision)
     {
-        if (playback.GetBeatSyncInfo(out CriAtomExBeatSync.Info info))
+        var nowTime = info.NowTime;
+        float secondsPerBeat = 60f / info.Bpm / beatDivision;
+        float diffPrev = Mathf.Abs(nowTime - prevBeatTime);
+        float diffNext = Mathf.Abs(nowTime - nextBeatTime);
+        var diff = Mathf.Min(diffPrev, diffNext);
+        var greatDiff = secondsPerBeat * 0.2f;
+        var goodDiff = secondsPerBeat * 0.4f;
+        if (diff < greatDiff)
         {
-            var nowTime = playback.GetTime() / 1000f;
-            float secondsPerBeat = 60f / info.bpm / 2;
-            float diffPrev = Mathf.Abs(nowTime - prevBeatTime);
-            float diffNext = Mathf.Abs(nowTime - nextBeatTime);
-            var diff = Mathf.Min(diffPrev, diffNext);
-            var greatDiff = secondsPerBeat * 0.2f;
-            var goodDiff = secondsPerBeat * 0.4f;
-            if (diff < greatDiff)
-            {
-                return BeatActionType.Great;
-            }
-
-            if (diff < goodDiff)
-            {
-                return BeatActionType.Good;
-            }
-
-            return BeatActionType.Bad;
+            return BeatActionType.Great;
         }
 
-        Debug.Log("PlayBackが取得できません");
-        return BeatActionType.None;
-    }
-    
-    public static float BeforeOnBeat(CriAtomExPlayback playback, float preparationTime, int beatNum)
-    {
-        if (playback.GetBeatSyncInfo(out CriAtomExBeatSync.Info info))
+        if (diff < goodDiff)
         {
-            var nowTime = playback.GetTime() / 1000f;
-            float secondsPerBeat = 60f / info.bpm / 2;
-            var targetTime = secondsPerBeat * beatNum;
-            var startTime = targetTime - preparationTime;
-            var waitTime = startTime - nowTime;
-            if (waitTime > 0) return waitTime;
-            Debug.Log("指定した拍は過ぎています");
-            return 0;
+            return BeatActionType.Good;
         }
 
-        Debug.Log("playbackが情報を取得できませんでした");
-        return 0;
+        return BeatActionType.Bad;
     }
 
+    public static double TimeUntilBeat(BeatInfo info, float preparationTime, int beatOffset)
+    {
+        var nowTime = info.NowTime;
+        var targetTime = info.SecondsPerBeat * (info.CurrentBeat + beatOffset);
+        var startTime = targetTime - preparationTime;
+        var waitTime = (double)startTime - nowTime;
+        return waitTime > 0 ? waitTime : 0;
+    }
 }
+
 public enum BeatActionType
 {
     Bad,
