@@ -33,6 +33,19 @@ public class BeatSyncDispatcher : MonoBehaviour
     }
 
     public void Clear() => _listeners.Clear();
+    
+    public T Get<T>() where T : class, IBeatSyncListener
+    {
+        foreach (var listener in _listeners)
+        {
+            if (listener is T tListener)
+            {
+                return tListener;
+                // クラスでありIBeatSyncListenerを継承しているTを探してTを返す
+            }
+        }
+        return null; 
+    }
 
     public void Unregister(IBeatSyncListener listener)
     {
@@ -54,14 +67,11 @@ public class BeatSyncDispatcher : MonoBehaviour
         }
     }
     
+ 
+    
 }
 public interface IBeatSyncListener
 {
     void OnBeat(ref CriAtomExBeatSync.Info info);
-
-    int CurrentBpm { get; set; }
-
-    int DiffBpm { get; set; }
-
-    bool IsBeating { get; set; }
+    
 }

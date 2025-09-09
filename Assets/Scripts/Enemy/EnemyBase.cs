@@ -2,21 +2,29 @@ using System;
 using CriWare;
 using UnityEngine;
 
-public class EnemyBase : MonoBehaviour,IBeatSyncListener
+public class EnemyBase : MonoBehaviour
 {
     public int CurrentBpm { get; set; }
     public int DiffBpm { get; set; }
     public bool IsBeating { get; set; }
-    public float MaxHealth { get; set; }
-    public float CurrentHealth { get; set; }
-    public float AttackPower { get; set; }
     [SerializeField] private float _score;
 
     private Action _onDeath;
 
-    public virtual void OnBeat(ref CriAtomExBeatSync.Info info)
+    private BeatInfo _beatInfo;
+    
+    void Awake()
     {
-        
+    }
+    
+    private void OnDisable()
+    {
+
+    }
+    
+    public void UpdateInfo(BeatInfo info)
+    {
+        _beatInfo = info;
     }
 
     public void InitOnPool(Action release)
