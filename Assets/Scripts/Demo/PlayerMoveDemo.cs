@@ -24,10 +24,12 @@ public class PlayerMoveDemo : MonoBehaviour
     [SerializeField] private float _blinkTime;
     private CancellationTokenSource _cts;
     private float _lerpTime;
+    private InputManager _inputManager;
     private void Start()
     {
         _rigidbody = GetComponent<Rigidbody>();
         _canBlink = true;
+        _inputManager = BeatSyncDispatcher.Instance.Get<InputManager>();
         _cts = new CancellationTokenSource();
     }
 
@@ -43,26 +45,24 @@ public class PlayerMoveDemo : MonoBehaviour
         Run();
     }
 
-    void Run()
+    private void Run()
     {
-        var input = new Vector3(Input.GetAxis("Horizontal"),0, Input.GetAxis("Vertical")).normalized;
+        var input = _inputManager.GetMoveDirection();
         var velo = new Vector3(input.x * _speed, _rigidbody.linearVelocity.y, input.z * _speed);
         _rigidbody.linearVelocity = velo;
     }
 
-    void Jump()
+    private void Jump()
     {
-        if (_jumpCount < _jumpForceList.Length && Input.GetKeyDown(KeyCode.Space))
-        {
-            _jumpCount++;
-            var velo = _rigidbody.linearVelocity;
-            velo.y = 0;
-            _rigidbody.linearVelocity = velo;
-            _rigidbody.AddForce(transform.up * SetJumpForce(_jumpCount), ForceMode.Impulse);
-        }
+        if (_jumpCount >= _jumpForceList.Length || _inputManager.CurrentInputType != InputType.Spase) return;
+        _jumpCount++;
+        var velo = _rigidbody.linearVelocity;
+        velo.y = 0;
+        _rigidbody.linearVelocity = velo;
+        _rigidbody.AddForce(transform.up * SetJumpForce(_jumpCount), ForceMode.Impulse);
     }
 
-    void IsGround()
+    private void IsGround()
     {
         var hit = Physics.Raycast(transform.position, Vector3.down,_rayCastMaxDistance, _groundLayer);
         if (hit)
@@ -81,18 +81,16 @@ public class PlayerMoveDemo : MonoBehaviour
 
     private void Blink()
     {
-        if (Input.GetMouseButtonDown(0) && _canBlink)
+        if (_inputManager.CurrentInputType != InputType.Blink || !_canBlink) return;
+        _lerpTime = 0;
+        var velo = _rigidbody.linearVelocity.normalized;
+        velo.y = 0;
+        if (velo == Vector3.zero)
         {
-            _lerpTime = 0;
-            var velo = _rigidbody.linearVelocity.normalized;
-            velo.y = 0;
-            if (velo == Vector3.zero)
-            {
-                velo = transform.forward;
-            }
-            _canBlink = false;
-            BlinkCoolDown(velo).Forget();
+            velo = transform.forward;
         }
+        _canBlink = false;
+        BlinkCoolDown(velo).Forget();
     }
 
     private async UniTaskVoid BlinkCoolDown(Vector3 velo)
@@ -111,7 +109,7 @@ public class PlayerMoveDemo : MonoBehaviour
         _canBlink = true;
     } 
 
-    float SetJumpForce(int jumpCount)
+    private float SetJumpForce(int jumpCount)
     {
         return _jumpForceList[jumpCount - 1];
     }
