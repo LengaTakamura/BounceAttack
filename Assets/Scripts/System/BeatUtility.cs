@@ -1,13 +1,19 @@
 using System;
+using UnityEditor.Build.Reporting;
 using UnityEngine;
 
 public static class BeatUtility
 {
-    public static BeatActionType JudgeBeatAction(BeatInfo info, float prevBeatTime, float nextBeatTime,
-        int beatDivision)
+    
+    
+    /// <summary>
+    /// Beatに現在のタイミングがどれだけ近いかをTypeで返す
+    /// divideBeatでBPMを減らす場合、時間の更新も併せて減らして下さい
+    /// </summary>
+    public static BeatActionType JudgeBeatAction(BeatInfo info, float prevBeatTime, float nextBeatTime,int divideBeat = 1)                                        
     {
         var nowTime = info.NowTime;
-        float secondsPerBeat = 60f / info.Bpm / beatDivision;
+        float secondsPerBeat = (60f / info.Bpm )* divideBeat;
         float diffPrev = Mathf.Abs(nowTime - prevBeatTime);
         float diffNext = Mathf.Abs(nowTime - nextBeatTime);
         var diff = Mathf.Min(diffPrev, diffNext);
