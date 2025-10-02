@@ -5,16 +5,10 @@ using UnityEngine;
 
 public class BeatSystem : MonoBehaviour, IBeatSyncListener
 {
-    public int CurrentBpm { get; set; }
-    public int DiffBpm { get; set; }
-    public bool IsBeating { get; set; }
-    
-    [SerializeField]private SoundManager _soundManager;
+    [SerializeField] private SoundManager _soundManager;
     
     private CriAtomExPlayback _playback;
-
-    public Action<BeatInfo> OnBeatAction {get; set; }
-
+    
     private int _count;
 
     private float _prevTime;
@@ -40,12 +34,10 @@ public class BeatSystem : MonoBehaviour, IBeatSyncListener
         }
     }
 
-    public void OnBeat(ref CriAtomExBeatSync.Info info)
+    public void OnBeat(BeatInfo info)
     {
-        var beatInfo = UpdateInfo(info);
-        OnBeatAction?.Invoke(beatInfo);
     }
-    private BeatInfo UpdateInfo(CriAtomExBeatSync.Info info)
+    public BeatInfo UpdateInfo(CriAtomExBeatSync.Info info)
     {
         _count++;
         var copy = new BeatInfo

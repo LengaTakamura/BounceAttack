@@ -63,13 +63,13 @@ public class BeatActionDemo : MonoBehaviour, IBeatSyncListener
         BeatSyncDispatcher.Instance.Unregister(this);
     }
 
-    public void OnBeat(ref CriAtomExBeatSync.Info info)
+    public void OnBeat(BeatInfo info)
     {
         _count++;
         if (_count % 2 == 0)
         {
             var nowTime = BGMPlayback.GetTime() / 1000f;
-            float secondsPerBeat = 60f / info.bpm / 2;
+            float secondsPerBeat = 60f / info.Bpm / 2;
             _prevBeatTime = nowTime;
             _nextBeatTime = nowTime + secondsPerBeat;
         }

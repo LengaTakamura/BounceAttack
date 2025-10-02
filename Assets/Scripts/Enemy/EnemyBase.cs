@@ -6,8 +6,6 @@ public class EnemyBase : MonoBehaviour
     [SerializeField] private float _score;
 
     private Action _onDeath;
-
-    protected BeatInfo BeatInfo;
     
     private float _timer;
     
@@ -23,12 +21,12 @@ public class EnemyBase : MonoBehaviour
 
     public virtual void EnemyOnBeat(BeatInfo info)
     {
-        BeatInfo = info;
+       
     }
 
     public virtual void Init(BeatInfo beatinfo)
     {
-        BeatInfo = beatinfo;
+        
     }
 
     public void InitOnPool(Action release)

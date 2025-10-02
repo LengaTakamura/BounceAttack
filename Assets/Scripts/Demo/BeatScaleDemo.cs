@@ -26,7 +26,7 @@ public class BeatScaleDemo : MonoBehaviour,IBeatSyncListener
         BeatSyncDispatcher.Instance.Unregister(this);
     }
 
-    public void OnBeat(ref CriAtomExBeatSync.Info info)
+    public void OnBeat(BeatInfo info)
     {
         _count++;
         if (_count % 2 == 0)

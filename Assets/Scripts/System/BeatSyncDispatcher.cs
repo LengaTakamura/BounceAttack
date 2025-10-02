@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using CriWare;
@@ -8,6 +9,7 @@ public class BeatSyncDispatcher : MonoBehaviour
 
     public static BeatSyncDispatcher Instance;
     
+    private BeatSystem _beatSystem;
     private void Awake()
     {
         if (Instance != null)
@@ -18,6 +20,11 @@ public class BeatSyncDispatcher : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(gameObject);
         CriAtomExBeatSync.OnCallback += ListenersOnBeat;
+    }
+
+    private void Start()
+    {
+        _beatSystem = Get<BeatSystem>();
     }
 
     public void Register(IBeatSyncListener listener)
@@ -63,7 +70,8 @@ public class BeatSyncDispatcher : MonoBehaviour
     {
         foreach (var listener in _listeners)
         {
-            listener.OnBeat(ref info);
+            var beatInfo = _beatSystem.UpdateInfo(info);
+            listener.OnBeat(beatInfo);
         }
     }
     
@@ -72,6 +80,6 @@ public class BeatSyncDispatcher : MonoBehaviour
 }
 public interface IBeatSyncListener
 {
-    void OnBeat(ref CriAtomExBeatSync.Info info);
+    void OnBeat(BeatInfo info);
     
 }

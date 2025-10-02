@@ -38,8 +38,8 @@ public class BoxEnemy : EnemyBase
         {
             _seq?.Kill();
             _seq = DOTween.Sequence()
-                .Append(transform.DOScale(new Vector3(3f, 3f, 3f), BeatInfo.SecondsPerBeat))
-                .Append(transform.DOScale(new Vector3(1f, 1f, 1f), BeatInfo.SecondsPerBeat));
+                .Append(transform.DOScale(new Vector3(3f, 3f, 3f), info.SecondsPerBeat))
+                .Append(transform.DOScale(new Vector3(1f, 1f, 1f), info.SecondsPerBeat));
         }
     }
     

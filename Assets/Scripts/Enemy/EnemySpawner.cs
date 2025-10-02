@@ -21,8 +21,6 @@ public class EnemySpawner : MonoBehaviour, IBeatSyncListener
     private void Start()
     {
         BeatSyncDispatcher.Instance.Register(this);
-        _beatSystem = BeatSyncDispatcher.Instance.Get<BeatSystem>();
-        _beatSystem.OnBeatAction += UpdateSpawnerInfo;
         Init();
     }
 
@@ -67,14 +65,10 @@ public class EnemySpawner : MonoBehaviour, IBeatSyncListener
         var obj = Instantiate(_enemyList[enemyIndex]);
         return obj;
     }
-
-    private void UpdateSpawnerInfo(BeatInfo beatInfo)
+    
+    public void OnBeat(BeatInfo beatInfo)
     {
         _beatInfo = beatInfo;
-    }
-
-    public void OnBeat(ref CriAtomExBeatSync.Info info)
-    {
         _onBeatAction?.Invoke(_beatInfo);
         if ((int)_beatInfo.BeatCount % 3 == 0)
         {
