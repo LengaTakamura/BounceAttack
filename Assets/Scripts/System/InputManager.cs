@@ -1,23 +1,26 @@
+using System.Collections.Generic;
 using CriWare;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 namespace System
 {
-    public class InputManager : MonoBehaviour,IBeatSyncListener
+    public class InputManager : MonoBehaviour, IBeatSyncListener
     {
-        public Action OnClick;
-        public Action OnPressSpace;
         BeatInfo _info;
         private float _prevBeatTime;
         private float _nextBeatTime;
-        public InputType CurrentInputType {get; private set;}
-        [SerializeField] private SerializedDictionary<InputType, int> _baseScores = new();
+        public InputType CurrentInputType { get; private set; }
+        [SerializeField] private SerializableDictionary<InputType, int> _baseScores = new();
         private int _count;
-        private void Awake()
+        private GameEvents _gameEvents;
+
+        private void Start()
         {
             BeatSyncDispatcher.Instance.Register(this);
+            _gameEvents = GameEvents.Instance;
         }
-        
+
         private void Update()
         {
             CurrentInputType = GetInputType();
@@ -27,8 +30,8 @@ namespace System
         private InputType GetInputType()
         {
             if (Input.GetKeyDown(KeyCode.Space)) return InputType.Spase;
-            if(Input.GetMouseButtonDown(0)) return InputType.Attack;
-            if(Input.GetMouseButtonDown(1)) return InputType.Blink;
+            if (Input.GetMouseButtonDown(0)) return InputType.Attack;
+            if (Input.GetMouseButtonDown(1)) return InputType.Blink;
             return InputType.None;
         }
 
@@ -37,16 +40,19 @@ namespace System
             switch (CurrentInputType)
             {
                 case InputType.Spase:
-                    var typeSpase = BeatUtility.JudgeBeatAction(_info,_prevBeatTime,_nextBeatTime);
-                    GameEvents.Instance.AddScore((int)Score(InputType.Spase, typeSpase));
+                    var typeSpase = BeatUtility.JudgeBeatAction(_info, _prevBeatTime, _nextBeatTime);
+                    _gameEvents.AddScore((int)Score(InputType.Spase, typeSpase));
+                    _gameEvents.UpdateInputAction(typeSpase);
                     break;
                 case InputType.Attack:
-                    var typeAttack = BeatUtility.JudgeBeatAction(_info,_prevBeatTime,_nextBeatTime);
-                    GameEvents.Instance.AddScore((int)Score(InputType.Attack, typeAttack));
+                    var typeAttack = BeatUtility.JudgeBeatAction(_info, _prevBeatTime, _nextBeatTime);
+                    _gameEvents.AddScore((int)Score(InputType.Attack, typeAttack));
+                    _gameEvents.UpdateInputAction(typeAttack);
                     break;
                 case InputType.Blink:
-                    var typeBlink = BeatUtility.JudgeBeatAction(_info,_prevBeatTime,_nextBeatTime);
-                    GameEvents.Instance.AddScore((int)Score(InputType.Blink, typeBlink));
+                    var typeBlink = BeatUtility.JudgeBeatAction(_info, _prevBeatTime, _nextBeatTime);
+                    _gameEvents.AddScore((int)Score(InputType.Blink, typeBlink));
+                    _gameEvents.UpdateInputAction(typeBlink);
                     break;
                 case InputType.None:
                     break;
@@ -55,7 +61,7 @@ namespace System
             }
         }
 
-        private float Score(InputType inputType,BeatActionType actionType)
+        private float Score(InputType inputType, BeatActionType actionType)
         {
             switch (actionType)
             {
@@ -76,19 +82,20 @@ namespace System
                     return _baseScores[inputType] * 1.5f;
                 }
             }
+
             return 0;
         }
 
         public Vector3 GetMoveDirection()
         {
-            return new Vector3(Input.GetAxis("Horizontal"),0, Input.GetAxis("Vertical")).normalized;
+            return new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical")).normalized;
         }
-    
+
         public void OnBeat(BeatInfo info)
         {
             UpdateInputInfo(info);
         }
-        
+
         private void UpdateInputInfo(BeatInfo beatInfo)
         {
             _info = beatInfo;
@@ -106,11 +113,64 @@ namespace System
             BeatSyncDispatcher.Instance.Unregister(this);
         }
     }
+    
+    [Serializable]
+    public class SerializableDictionary<TKey, TValue> :
+        Dictionary<TKey, TValue>,
+        ISerializationCallbackReceiver
+    {
+        [Serializable]
+        public class Pair
+        {
+            public TKey key = default;
+            public TValue value = default;
 
+            /// <summary>
+            /// Pair
+            /// </summary>
+            public Pair(TKey key, TValue value)
+            {
+                this.key = key;
+                this.value = value;
+            }
+        }
 
+        [SerializeField]
+        private List<Pair> _list = null;
 
+        /// <summary>
+        /// OnAfterDeserialize
+        /// </summary>
+        void ISerializationCallbackReceiver.OnAfterDeserialize()
+        {
+            Clear();
+            foreach (Pair pair in _list)
+            {
+                if (ContainsKey(pair.key))
+                {
+                    continue;
+                }
+                Add(pair.key, pair.value);
+            }
+        }
+
+        /// <summary>
+        /// OnBeforeSerialize
+        /// </summary>
+        void ISerializationCallbackReceiver.OnBeforeSerialize()
+        {
+            // 処理なし
+        }
+    }
     public enum InputType
     {
-        None,Spase,Blink,Attack
+        None,
+        Spase,
+        Blink,
+        Attack
     }
 }
+
+
+  
+    

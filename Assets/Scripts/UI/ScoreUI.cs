@@ -12,12 +12,10 @@ namespace UI
 
         private Sequence _seq;
         
-        private int _previousScore;
         public override void Init(GameEvents gameEvents)
         {
-            _previousScore = 0;
             _valueText = GetComponent<TextMeshProUGUI>();
-            gameEvents.CurrentScore.Pairwise().Subscribe(value => UpdateScoreText(value.Previous, value.Current));
+            gameEvents.CurrentScore.Pairwise().Subscribe(value => UpdateScoreText(value.Previous, value.Current)).AddTo(this);
         }
 
         public override void UIOnBeat(BeatInfo info)

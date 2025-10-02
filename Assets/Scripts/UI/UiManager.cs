@@ -11,7 +11,7 @@ namespace UI
        [SerializeField] private List<UiBase> _uiObjects = new();
        
         private GameEvents _gameEvents;
-        private void Awake()
+        private void Start()
         {
             BeatSyncDispatcher.Instance.Register(this);
             _gameEvents = GameEvents.Instance;
@@ -31,21 +31,12 @@ namespace UI
 
         private void SwitchSubscribe(UiBase ui)
         {
-            switch (ui.UiType)
-            {
-                case UiType.Score:
-                {
-                    ui.Init(_gameEvents);
-                    break;
-                }
-                
-            }
-            
+           ui.Init(_gameEvents);
         }
     }
 
     public enum UiType
     {
-        Score,Time,Enemy,None
+        Score,InputAction,Time,Enemy,None
     }
 }
