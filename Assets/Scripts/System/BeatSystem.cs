@@ -13,13 +13,9 @@ public class BeatSystem : MonoBehaviour, IBeatSyncListener
 
     private float _prevTime;
     
-    private void Awake()
-    {
-        BeatSyncDispatcher.Instance.Register(this);
-    }
-
     private void Start()
     {
+        BeatSyncDispatcher.Instance.Register(this);
         Init().Forget();
         _count = -1;
     }

@@ -24,12 +24,11 @@ public class PlayerMoveDemo : MonoBehaviour
     [SerializeField] private float _blinkTime;
     private CancellationTokenSource _cts;
     private float _lerpTime;
-    private InputManager _inputManager;
+    [SerializeField] private InputManager _inputManager;
     private void Start()
     {
         _rigidbody = GetComponent<Rigidbody>();
         _canBlink = true;
-        _inputManager = BeatSyncDispatcher.Instance.Get<InputManager>();
         _cts = new CancellationTokenSource();
     }
 
