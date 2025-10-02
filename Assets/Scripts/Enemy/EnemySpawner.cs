@@ -18,7 +18,7 @@ public class EnemySpawner : MonoBehaviour, IBeatSyncListener
     private BeatInfo _beatInfo;
     private BeatSystem _beatSystem;
 
-    private void Start()
+    private void Awake()
     {
         BeatSyncDispatcher.Instance.Register(this);
         Init();
