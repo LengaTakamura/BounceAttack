@@ -10,8 +10,10 @@ namespace System
         BeatInfo _info;
         private float _prevBeatTime;
         private float _nextBeatTime;
-        public InputType CurrentInputType;
-        private void Start()
+        public InputType CurrentInputType {get; private set;}
+        [SerializeField] private SerializedDictionary<InputType, int> _baseScores = new();
+        private int _count;
+        private void Awake()
         {
             BeatSyncDispatcher.Instance.Register(this);
         }
@@ -36,18 +38,45 @@ namespace System
             {
                 case InputType.Spase:
                     var typeSpase = BeatUtility.JudgeBeatAction(_info,_prevBeatTime,_nextBeatTime);
+                    GameEvents.Instance.AddScore((int)Score(InputType.Spase, typeSpase));
                     break;
                 case InputType.Attack:
                     var typeAttack = BeatUtility.JudgeBeatAction(_info,_prevBeatTime,_nextBeatTime);
+                    GameEvents.Instance.AddScore((int)Score(InputType.Attack, typeAttack));
                     break;
                 case InputType.Blink:
                     var typeBlink = BeatUtility.JudgeBeatAction(_info,_prevBeatTime,_nextBeatTime);
+                    GameEvents.Instance.AddScore((int)Score(InputType.Blink, typeBlink));
                     break;
                 case InputType.None:
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+        }
+
+        private float Score(InputType inputType,BeatActionType actionType)
+        {
+            switch (actionType)
+            {
+                case BeatActionType.None:
+                {
+                    return 0;
+                }
+                case BeatActionType.Bad:
+                {
+                    return _baseScores[inputType] * 0.5f;
+                }
+                case BeatActionType.Good:
+                {
+                    return _baseScores[inputType];
+                }
+                case BeatActionType.Great:
+                {
+                    return _baseScores[inputType] * 1.5f;
+                }
+            }
+            return 0;
         }
 
         public Vector3 GetMoveDirection()
@@ -63,8 +92,12 @@ namespace System
         private void UpdateInputInfo(BeatInfo beatInfo)
         {
             _info = beatInfo;
-            _prevBeatTime = _info.NowTime;
-            _nextBeatTime = _info.NowTime + _info.SecondsPerBeat;
+            _count++;
+            if (_count % 2 == 0)
+            {
+                _prevBeatTime = beatInfo.NowTime;
+                _nextBeatTime = beatInfo.NowTime + beatInfo.SecondsPerBeat;
+            }
         }
 
 
