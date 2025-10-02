@@ -1,30 +1,32 @@
 using System;
-using CriWare;
 using UnityEngine;
 
 public class EnemyBase : MonoBehaviour
 {
-    public int CurrentBpm { get; set; }
-    public int DiffBpm { get; set; }
-    public bool IsBeating { get; set; }
     [SerializeField] private float _score;
 
     private Action _onDeath;
-
-    private BeatInfo _beatInfo;
+    
+    private float _timer;
     
     void Awake()
     {
     }
     
-    private void OnDisable()
-    {
 
-    }
-    
-    public void UpdateInfo(BeatInfo info)
+    private void Update()
     {
-        _beatInfo = info;
+       
+    }
+
+    public virtual void EnemyOnBeat(BeatInfo info)
+    {
+       
+    }
+
+    public virtual void Init(BeatInfo beatinfo)
+    {
+        
     }
 
     public void InitOnPool(Action release)
@@ -35,6 +37,7 @@ public class EnemyBase : MonoBehaviour
     public virtual float Kill()
     {
         _onDeath?.Invoke();
+        _onDeath = null;
         return _score;
     }
     

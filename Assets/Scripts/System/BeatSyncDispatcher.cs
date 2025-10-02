@@ -1,77 +1,82 @@
 using System.Collections.Generic;
-using UnityEngine;
 using CriWare;
+using UnityEngine;
 
-public class BeatSyncDispatcher : MonoBehaviour
+namespace System
 {
-    private readonly List<IBeatSyncListener> _listeners = new();
-
-    public static BeatSyncDispatcher Instance;
-    
-    private void Awake()
+    public class BeatSyncDispatcher : MonoBehaviour
     {
-        if (Instance != null)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        Instance = this;
-        DontDestroyOnLoad(gameObject);
-        CriAtomExBeatSync.OnCallback += ListenersOnBeat;
-    }
+        private readonly List<IBeatSyncListener> _listeners = new();
 
-    public void Register(IBeatSyncListener listener)
-    {
-        if (!_listeners.Contains(listener))
-        {
-            _listeners.Add(listener);
-        }
-        else
-        {
-            Debug.LogWarning("listener already registered");
-        }
-    }
+        public static BeatSyncDispatcher Instance;
 
-    public void Clear() => _listeners.Clear();
-    
-    public T Get<T>() where T : class, IBeatSyncListener
-    {
-        foreach (var listener in _listeners)
+        [SerializeField] private BeatSystem _beatSystem;
+
+        private void Awake()
         {
-            if (listener is T tListener)
+            if (Instance != null)
             {
-                return tListener;
-                // クラスでありIBeatSyncListenerを継承しているTを探してTを返す
+                Destroy(gameObject);
+                return;
+            }
+
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+            CriAtomExBeatSync.OnCallback += ListenersOnBeat;
+        }
+
+        public void Register(IBeatSyncListener listener)
+        {
+            if (!_listeners.Contains(listener))
+            {
+                _listeners.Add(listener);
+            }
+            else
+            {
+                Debug.LogWarning("listener already registered");
             }
         }
-        return null; 
+
+        public void Clear() => _listeners.Clear();
+
+        public T Get<T>() where T : class, IBeatSyncListener
+        {
+            foreach (var listener in _listeners)
+            {
+                if (listener is T tListener)
+                {
+                    return tListener;
+                    // クラスでありIBeatSyncListenerを継承しているTを探してTを返す
+                }
+            }
+
+            return null;
+        }
+
+        public void Unregister(IBeatSyncListener listener)
+        {
+            if (_listeners.Contains(listener))
+            {
+                _listeners.Remove(listener);
+            }
+            else
+            {
+                Debug.LogWarning("listener not registered");
+            }
+        }
+
+        private void ListenersOnBeat(ref CriAtomExBeatSync.Info info)
+        {
+            var beatInfo = _beatSystem.UpdateInfo(info);
+            foreach (var listener in _listeners)
+            {
+                listener.OnBeat(beatInfo);
+            }
+        }
     }
 
-    public void Unregister(IBeatSyncListener listener)
+    public interface IBeatSyncListener
     {
-        if (_listeners.Contains(listener))
-        {
-            _listeners.Remove(listener);
-        }
-        else
-        {
-            Debug.LogWarning("listener not registered");
-        }
+        void OnBeat(BeatInfo info);
     }
-
-    private void ListenersOnBeat(ref CriAtomExBeatSync.Info info)
-    {
-        foreach (var listener in _listeners)
-        {
-            listener.OnBeat(ref info);
-        }
-    }
-    
- 
-    
-}
-public interface IBeatSyncListener
-{
-    void OnBeat(ref CriAtomExBeatSync.Info info);
-    
 }
