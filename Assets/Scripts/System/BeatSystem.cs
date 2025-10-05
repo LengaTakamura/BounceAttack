@@ -1,3 +1,4 @@
+
 using System;
 using CriWare;
 using Cysharp.Threading.Tasks;
@@ -13,6 +14,11 @@ public class BeatSystem : MonoBehaviour, IBeatSyncListener
 
     private float _prevTime;
     
+    public bool IsPlaying => _playback.status == CriAtomExPlayback.Status.Playing;
+    
+    public float SecondsPerBeat => 60f / _defaultBpm;
+    
+    [SerializeField] private int _defaultBpm = 60;
     private void Start()
     {
         BeatSyncDispatcher.Instance.Register(this);
