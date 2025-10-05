@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using R3;
 using UnityEngine;
 
 namespace UI
@@ -17,7 +16,7 @@ namespace UI
             _gameEvents = GameEvents.Instance;
             foreach (var uiObject in _uiObjects)
             {
-                SwitchSubscribe(uiObject);
+                UiObjectsInit(uiObject);
             }
         }
 
@@ -29,7 +28,7 @@ namespace UI
             }
         }
 
-        private void SwitchSubscribe(UiBase ui)
+        private void UiObjectsInit(UiBase ui)
         {
            ui.Init(_gameEvents);
         }
