@@ -1,16 +1,16 @@
 using UnityEngine;
 
-public class InGameManager : MonoBehaviour
+namespace System
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public class InGameManager : MonoBehaviour
     {
+        private BeatSystem _beatSystem;
         
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
+        private void Start()
+        {
+            _beatSystem = BeatSyncDispatcher.Instance.Get<BeatSystem>();
+        }
+        
         
     }
 }

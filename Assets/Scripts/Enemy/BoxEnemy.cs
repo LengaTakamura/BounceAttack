@@ -1,7 +1,9 @@
+using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class BoxEnemy : EnemyBase
 {
@@ -18,11 +20,11 @@ public class BoxEnemy : EnemyBase
 
     private async UniTaskVoid Death()
     {
-        var randomx = Random.Range(0f, 10f);
-        var randomy = Random.Range(0f, 10f);
-        var randomz = Random.Range(0f, 10f);
+        var randomX = Random.Range(0f, 10f);
+        var randomY = Random.Range(0f, 10f);
+        var randomZ = Random.Range(0f, 10f);
         var cts = new CancellationTokenSource();
-        await transform.DOLocalMove(new Vector3(randomx, randomy, randomz), 10f).SetEase(Ease.Linear).ToUniTask(cancellationToken: cts.Token);
+        await transform.DOLocalMove(new Vector3(randomX, randomY, randomZ), 10f).SetEase(Ease.Linear).ToUniTask(cancellationToken: cts.Token);
         Kill();
         cts.Cancel();
         cts.Dispose();

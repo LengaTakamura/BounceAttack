@@ -40,7 +40,7 @@ namespace Chart
             defaultCapacity: _defaultSize,
             maxSize: _maxSize
          );
-         _delayTime = BeatSyncDispatcher.Instance.Get<BeatSystem>().SecondsPerBeat;
+         _delayTime = BeatSyncDispatcher.Instance.Get<BeatSystem>().DefaultSecondsPerBeat;
       }
 
       private ChartController InstantiateChart()

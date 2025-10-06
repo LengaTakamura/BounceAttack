@@ -25,7 +25,7 @@ namespace UI
         {
         }
 
-        public void OnActionTriggered(BeatActionType action)
+        private void OnActionTriggered(BeatActionType action)
         {
             switch (action)
             {

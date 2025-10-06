@@ -12,7 +12,6 @@ namespace System
         private float _nextBeatTime;
         public InputType CurrentInputType { get; private set; }
         [SerializeField] private SerializableDictionary<InputType, int> _baseScores = new();
-        private int _count;
         private GameEvents _gameEvents;
 
         private void Start()
@@ -99,12 +98,6 @@ namespace System
         private void UpdateInputInfo(BeatInfo beatInfo)
         {
             _info = beatInfo;
-            _count++;
-            if (_count % 2 == 0)
-            {
-                _prevBeatTime = beatInfo.NowTime;
-                _nextBeatTime = beatInfo.NowTime + beatInfo.SecondsPerBeat;
-            }
         }
 
 

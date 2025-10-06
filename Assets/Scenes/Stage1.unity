@@ -434,7 +434,7 @@ MonoBehaviour:
   _use3dPositioning: 1
   _freezeOrientation: 0
   _loop: 0
-  _volume: 0.29
+  _volume: 0.036
   _pitch: 0
   _androidUseLowLatencyVoicePool: 0
   need_to_player_update_all: 1
@@ -2081,6 +2081,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _soundManager: {fileID: 355822104}
   _defaultBpm: 60
+  _changeTempoBeat: 50
 --- !u!4 &1997912421
 Transform:
   m_ObjectHideFlags: 0
