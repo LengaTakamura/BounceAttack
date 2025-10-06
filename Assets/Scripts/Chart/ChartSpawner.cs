@@ -19,6 +19,7 @@ namespace Chart
       [SerializeField] private int _defaultSize;
       [SerializeField] private int _maxSize;
       private float _delayTime;
+      private BeatInfo _beatInfo;
       private void Awake()
       {
          BeatSyncDispatcher.Instance.Register(this);
@@ -52,7 +53,8 @@ namespace Chart
       private void GetChart(ChartController chart)
       {
          chart.gameObject.SetActive(true);
-         chart.Init(_targetImage.rectTransform);
+         chart.Init(_targetImage.rectTransform,_beatInfo);
+         chart.OnDeath += () => _chartImagePool.Release(chart);
       }
 
       private void ReleaseChart(ChartController chart)
@@ -67,7 +69,7 @@ namespace Chart
 
       public void OnBeat(BeatInfo info)
       {
-         
+         _beatInfo = info;
       }
 
       private void OnDestroy()
