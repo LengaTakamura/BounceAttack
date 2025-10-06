@@ -19,7 +19,6 @@ namespace System
                 Destroy(gameObject);
                 return;
             }
-
             Instance = this;
             DontDestroyOnLoad(gameObject);
             CriAtomExBeatSync.OnCallback += ListenersOnBeat;
@@ -67,10 +66,11 @@ namespace System
 
         private void ListenersOnBeat(ref CriAtomExBeatSync.Info info)
         {
-            var beatInfo = _beatSystem.UpdateInfo(info);
+            var beatInfo = _beatSystem.UpdateInfo(info); //情報の更新
+            if(_beatSystem.CurrentTempo == TempoState.Normal && beatInfo.CurrentBeat % 2 == 0) return;
             foreach (var listener in _listeners)
             {
-                listener.OnBeat(beatInfo);
+                listener.OnBeat(beatInfo);　// 更新された情報を各要素に注入
             }
         }
     }
