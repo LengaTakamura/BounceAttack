@@ -23,7 +23,7 @@ public class SphereEnemy : EnemyBase
         await transform.DOJump(new Vector3(0f, 0f, 0f), jumpPower: 3f, numJumps: 3, duration: preparationTime).ToUniTask(cancellationToken: cts.Token);
         Instantiate(_effect, transform.position, Quaternion.identity);
         Kill();
-        cts.Dispose();
+        cts?.Dispose();
     }
 
     public override void Init(BeatInfo beatinfo)
