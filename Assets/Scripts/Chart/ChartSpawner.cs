@@ -18,7 +18,7 @@ namespace Chart
       private ObjectPool<ChartController> _chartImagePool;
       [SerializeField] private int _defaultSize;
       [SerializeField] private int _maxSize;
-      private float _delayTime;
+      private Vector2 _initialPosition;
       private BeatInfo _beatInfo;
       private void Awake()
       {
@@ -41,7 +41,7 @@ namespace Chart
             defaultCapacity: _defaultSize,
             maxSize: _maxSize
          );
-         _delayTime = BeatSyncDispatcher.Instance.Get<BeatSystem>().DefaultSecondsPerBeat;
+         _initialPosition = _chart.GetComponent<RectTransform>().anchoredPosition;
       }
 
       private ChartController InstantiateChart()
@@ -52,6 +52,7 @@ namespace Chart
 
       private void GetChart(ChartController chart)
       {
+         chart.GetComponent<RectTransform>().anchoredPosition = _initialPosition;
          chart.gameObject.SetActive(true);
          chart.Init(_targetImage.rectTransform,_beatInfo);
          chart.OnDeath += () => _chartImagePool.Release(chart);
@@ -70,6 +71,7 @@ namespace Chart
       public void OnBeat(BeatInfo info)
       {
          _beatInfo = info;
+         _chartImagePool.Get();
       }
 
       private void OnDestroy()

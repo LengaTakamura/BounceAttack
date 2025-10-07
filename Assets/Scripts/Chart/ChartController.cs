@@ -13,7 +13,6 @@ namespace Chart
         public Action OnDeath { get; set; }
         
         private CancellationTokenSource _cts;
-        
         public void Init(RectTransform targetRectTransform,BeatInfo beatInfo)
         {
             _cts = new CancellationTokenSource();
@@ -23,11 +22,15 @@ namespace Chart
 
         private async UniTaskVoid Move(RectTransform targetRectTransform,float secondsPerBeat,CancellationToken token)
         {
-            await _rectTransform.DOMove(targetRectTransform.anchoredPosition,secondsPerBeat * 4f).ToUniTask(cancellationToken: token);
-            _cts?.Cancel();
-            _cts?.Dispose();
+            await _rectTransform.DOAnchorPos(targetRectTransform.anchoredPosition,secondsPerBeat * 4f).ToUniTask(cancellationToken: token);
             OnDeath?.Invoke();
             OnDeath = null;
+        }
+
+        private void OnDisable()
+        {
+            _cts?.Cancel();
+            _cts?.Dispose();
         }
 
         private void OnDestroy()
