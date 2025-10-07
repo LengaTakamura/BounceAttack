@@ -10,13 +10,13 @@ public static class BeatUtility
     /// Beatに現在のタイミングがどれだけ近いかをTypeで返す
     /// divideBeatでBPMを減らす場合、時間の更新も併せて減らして下さい
     /// </summary>
-    public static BeatActionType JudgeBeatAction(BeatInfo info, float prevBeatTime, float nextBeatTime,int divideBeat = 1)                                        
+    public static BeatActionType JudgeBeatAction(BeatInfo info)                                        
     {
-        var nowTime = info.NowTime;
-        float secondsPerBeat = (60f / info.Bpm )* divideBeat;
-        float diffPrev = Mathf.Abs(nowTime - prevBeatTime);
-        float diffNext = Mathf.Abs(nowTime - nextBeatTime);
-        var diff = Mathf.Min(diffPrev, diffNext);
+        var nowTime = (ulong)info.Playback.GetTime() / (ulong)1000f;
+        var secondsPerBeat = info.SecondsPerBeat;
+        var diffPrev = nowTime - info.PrevBeatTime;
+        var diffNext = info.NextBeatTime - nowTime;
+        var diff =  diffPrev > diffNext ? diffNext : diffPrev;
         var greatDiff = secondsPerBeat * 0.2f;
         var goodDiff = secondsPerBeat * 0.4f;
         if (diff < greatDiff)
