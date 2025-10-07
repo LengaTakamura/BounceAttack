@@ -13,9 +13,7 @@ namespace System
         private int _count;
 
         private float _prevTime;
-    
-        public bool IsPlaying => _playback.status == CriAtomExPlayback.Status.Playing;
-    
+        
         public float DefaultSecondsPerBeat => 60f / _defaultBpm;
         
         [SerializeField] private int _defaultBpm = 60;
@@ -54,14 +52,20 @@ namespace System
             {
                 ChangeTempo();
             }
+
+            var time = (ulong)_playback.GetTime() / (ulong)1000f;
+            var secondsPerBeat = CurrentTempo == TempoState.Normal ? 60f / info.bpm * 2 : 60f / info.bpm;
             
             var copy = new BeatInfo
             {
                 Bpm = CurrentTempo == TempoState.Normal ? info.bpm / 2 : info.bpm,
-                SecondsPerBeat = CurrentTempo == TempoState.Normal ?  60f / info.bpm * 2 :  60f / info.bpm,
+                SecondsPerBeat = secondsPerBeat,
                 BeatCount = info.beatCount,
                 CurrentBeat = _count,
-                NowTime = (ulong)_playback.GetTime() / (ulong)1000f
+                NowTime = time,
+                PrevBeatTime = time,
+                NextBeatTime = time + (ulong)secondsPerBeat,
+                Playback = _playback,
             };
             
             return copy;
@@ -84,6 +88,9 @@ namespace System
         public float BeatCount;
         public int CurrentBeat;
         public ulong NowTime;
+        public ulong PrevBeatTime;
+        public ulong NextBeatTime;
+        public CriAtomExPlayback Playback;
     }
 
     public enum TempoState
