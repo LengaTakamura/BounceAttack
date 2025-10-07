@@ -21,10 +21,14 @@ namespace System
         public TempoState CurrentTempo { get;private set;}
         
         [SerializeField] private int _changeTempoBeat = 50;
-        
-        private void Start()
+
+        private void Awake()
         {
             BeatSyncDispatcher.Instance.Register(this);
+        }
+
+        private void Start()
+        {
             Init().Forget();
             _count = -1;
         }
