@@ -22,7 +22,7 @@ namespace Chart
 
         private async UniTaskVoid Move(RectTransform targetRectTransform,float secondsPerBeat,CancellationToken token)
         {
-            await _rectTransform.DOAnchorPos(targetRectTransform.anchoredPosition,secondsPerBeat * 4f).ToUniTask(cancellationToken: token);
+            await _rectTransform.DOAnchorPos(targetRectTransform.anchoredPosition,secondsPerBeat * 4f).SetEase(Ease.Linear).ToUniTask(cancellationToken: token);
             OnDeath?.Invoke();
             OnDeath = null;
         }
