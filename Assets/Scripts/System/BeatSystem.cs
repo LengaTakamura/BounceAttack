@@ -53,7 +53,7 @@ namespace System
                 ChangeTempo();
             }
 
-            var time = (ulong)_playback.GetTime() / (ulong)1000f;
+            var time = (double)_playback.GetTime() / 1000f;
             var secondsPerBeat = CurrentTempo == TempoState.Normal ? 60f / info.bpm * 2 : 60f / info.bpm;
             
             var copy = new BeatInfo
@@ -64,7 +64,7 @@ namespace System
                 CurrentBeat = _count,
                 NowTime = time,
                 PrevBeatTime = time,
-                NextBeatTime = time + (ulong)secondsPerBeat,
+                NextBeatTime = time + secondsPerBeat,
                 Playback = _playback,
             };
             
@@ -87,9 +87,9 @@ namespace System
         public float SecondsPerBeat;
         public float BeatCount;
         public int CurrentBeat;
-        public ulong NowTime;
-        public ulong PrevBeatTime;
-        public ulong NextBeatTime;
+        public double NowTime;
+        public double PrevBeatTime;
+        public double NextBeatTime;
         public CriAtomExPlayback Playback;
     }
 
