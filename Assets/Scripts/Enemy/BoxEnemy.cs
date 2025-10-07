@@ -30,8 +30,6 @@ namespace Enemy
             _cts = new CancellationTokenSource();
             await transform.DOLocalMove(new Vector3(randomX, randomY, randomZ), secondsPerBeat * _delay).SetEase(Ease.Linear).ToUniTask(cancellationToken: _cts.Token);
             Kill();
-            _cts.Cancel();
-            _cts.Dispose();
         }
         public override void EnemyOnBeat(BeatInfo info)
         {
