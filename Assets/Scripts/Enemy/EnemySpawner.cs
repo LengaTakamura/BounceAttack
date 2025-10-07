@@ -9,7 +9,7 @@ using Random = UnityEngine.Random;
 
 public class EnemySpawner : MonoBehaviour, IBeatSyncListener
 {
-    [SerializeField] private List<EnemyBase> _enemyList;
+    [SerializeField] private List<GameObject> _enemyList;
     [SerializeField] private List<Transform> _spawnPoints;
     private ObjectPool<EnemyBase> _pool;
     [SerializeField] private int _defaultSize;
@@ -63,7 +63,8 @@ public class EnemySpawner : MonoBehaviour, IBeatSyncListener
     {
         var enemyIndex = Random.Range(0, _enemyList.Count);
         var obj = Instantiate(_enemyList[enemyIndex]);
-        return obj;
+        var enemyBase = obj.GetComponent<EnemyBase>();
+        return enemyBase;
     }
     
     public void OnBeat(BeatInfo beatInfo)

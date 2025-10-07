@@ -434,7 +434,7 @@ MonoBehaviour:
   _use3dPositioning: 1
   _freezeOrientation: 0
   _loop: 0
-  _volume: 0.29
+  _volume: 0.036
   _pitch: 0
   _androidUseLowLatencyVoicePool: 0
   need_to_player_update_all: 1
@@ -1052,13 +1052,63 @@ RectTransform:
   - {fileID: 814107175}
   - {fileID: 1940621529}
   - {fileID: 10029343}
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1997912421}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!1 &1132825102
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1132825104}
+  - component: {fileID: 1132825103}
+  m_Layer: 0
+  m_Name: ChartSpawner
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!114 &1132825103
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1132825102}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f57687c7cd3f9c40b2e8a200f363f8e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _chart: {fileID: 0}
+  _canvas: {fileID: 0}
+  _targetImage: {fileID: 0}
+  _count: 5
+  _defaultSize: 0
+  _maxSize: 0
+--- !u!4 &1132825104
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1132825102}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -11.385437, y: 4.0740542, z: -6.3750434}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1246632954
 GameObject:
   m_ObjectHideFlags: 0
@@ -1757,9 +1807,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _enemyList:
-  - {fileID: -1892901875107988819, guid: 2c62bfa740831204284ddee8f9878a89, type: 3}
-  - {fileID: -8293295944533633158, guid: 96d2359f16206524b8f4cda026b61fd7, type: 3}
-  - {fileID: 732680152009656404, guid: e3af95dda8d70484089545a2b2cefe4a, type: 3}
+  - {fileID: 4345328958501210818, guid: 2c62bfa740831204284ddee8f9878a89, type: 3}
+  - {fileID: 803757340155504470, guid: 96d2359f16206524b8f4cda026b61fd7, type: 3}
+  - {fileID: 803757340155504470, guid: e3af95dda8d70484089545a2b2cefe4a, type: 3}
   _spawnPoints:
   - {fileID: 1557476623}
   - {fileID: 142463421}
@@ -2030,6 +2080,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _soundManager: {fileID: 355822104}
+  _defaultBpm: 60
+  _changeTempoBeat: 50
 --- !u!4 &1997912421
 Transform:
   m_ObjectHideFlags: 0
@@ -2042,7 +2094,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 996097763}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2013133450
@@ -2095,7 +2148,6 @@ SceneRoots:
   m_Roots:
   - {fileID: 1339626853}
   - {fileID: 1555907977}
-  - {fileID: 1997912421}
   - {fileID: 355822105}
   - {fileID: 1489406517}
   - {fileID: 724323070}
@@ -2105,8 +2157,9 @@ SceneRoots:
   - {fileID: 555279548}
   - {fileID: 1467109377}
   - {fileID: 1636654181}
-  - {fileID: 996097763}
+  - {fileID: 1997912421}
   - {fileID: 1533846814}
   - {fileID: 873405014}
   - {fileID: 2013133452}
   - {fileID: 1909977611}
+  - {fileID: 1132825104}

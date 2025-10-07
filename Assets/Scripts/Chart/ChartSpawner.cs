@@ -1,0 +1,80 @@
+using System;
+using UnityEngine;
+using UnityEngine.Pool;
+using UnityEngine.Serialization;
+using UnityEngine.UI;
+
+namespace Chart
+{
+   public class ChartSpawner : MonoBehaviour,IBeatSyncListener
+   {
+      [SerializeField] private ChartController _chart;
+      
+      [SerializeField] private Canvas _canvas;
+
+      [SerializeField] private Image _targetImage;
+      [SerializeField] private int _count = 5;
+      
+      private ObjectPool<ChartController> _chartImagePool;
+      [SerializeField] private int _defaultSize;
+      [SerializeField] private int _maxSize;
+      private float _delayTime;
+      private BeatInfo _beatInfo;
+      private void Awake()
+      {
+         BeatSyncDispatcher.Instance.Register(this);
+      }
+
+      private void Start()
+      {
+         Init();
+      }
+
+      private void Init()
+      {
+         _chartImagePool = new ObjectPool<ChartController>(
+            createFunc: InstantiateChart,
+            actionOnGet: GetChart,
+            actionOnRelease: ReleaseChart,
+            actionOnDestroy: DestroyChart,
+            collectionCheck: true,
+            defaultCapacity: _defaultSize,
+            maxSize: _maxSize
+         );
+         _delayTime = BeatSyncDispatcher.Instance.Get<BeatSystem>().DefaultSecondsPerBeat;
+      }
+
+      private ChartController InstantiateChart()
+      {
+         var chart = Instantiate(_chart,_canvas.transform);
+         return chart;
+      }
+
+      private void GetChart(ChartController chart)
+      {
+         chart.gameObject.SetActive(true);
+         chart.Init(_targetImage.rectTransform,_beatInfo);
+         chart.OnDeath += () => _chartImagePool.Release(chart);
+      }
+
+      private void ReleaseChart(ChartController chart)
+      {
+         chart.gameObject.SetActive(false);
+      }
+
+      private void DestroyChart(ChartController chart)
+      {
+         Destroy(chart.gameObject);
+      }
+
+      public void OnBeat(BeatInfo info)
+      {
+         _beatInfo = info;
+      }
+
+      private void OnDestroy()
+      {
+         BeatSyncDispatcher.Instance.Unregister(this);
+      }
+   }
+}

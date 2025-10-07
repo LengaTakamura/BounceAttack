@@ -1,7 +1,5 @@
 using System.Collections.Generic;
-using CriWare;
 using UnityEngine;
-using UnityEngine.Rendering;
 
 namespace System
 {
@@ -12,9 +10,8 @@ namespace System
         private float _nextBeatTime;
         public InputType CurrentInputType { get; private set; }
         [SerializeField] private SerializableDictionary<InputType, int> _baseScores = new();
-        private int _count;
         private GameEvents _gameEvents;
-
+        
         private void Start()
         {
             BeatSyncDispatcher.Instance.Register(this);
@@ -40,17 +37,17 @@ namespace System
             switch (CurrentInputType)
             {
                 case InputType.Spase:
-                    var typeSpase = BeatUtility.JudgeBeatAction(_info, _prevBeatTime, _nextBeatTime);
+                    var typeSpase = BeatUtility.JudgeBeatAction(_info);
                     _gameEvents.AddScore((int)Score(InputType.Spase, typeSpase));
                     _gameEvents.UpdateInputAction(typeSpase);
                     break;
                 case InputType.Attack:
-                    var typeAttack = BeatUtility.JudgeBeatAction(_info, _prevBeatTime, _nextBeatTime);
+                    var typeAttack = BeatUtility.JudgeBeatAction(_info);
                     _gameEvents.AddScore((int)Score(InputType.Attack, typeAttack));
                     _gameEvents.UpdateInputAction(typeAttack);
                     break;
                 case InputType.Blink:
-                    var typeBlink = BeatUtility.JudgeBeatAction(_info, _prevBeatTime, _nextBeatTime);
+                    var typeBlink = BeatUtility.JudgeBeatAction(_info);
                     _gameEvents.AddScore((int)Score(InputType.Blink, typeBlink));
                     _gameEvents.UpdateInputAction(typeBlink);
                     break;
@@ -99,12 +96,6 @@ namespace System
         private void UpdateInputInfo(BeatInfo beatInfo)
         {
             _info = beatInfo;
-            _count++;
-            if (_count % 2 == 0)
-            {
-                _prevBeatTime = beatInfo.NowTime;
-                _nextBeatTime = beatInfo.NowTime + beatInfo.SecondsPerBeat;
-            }
         }
 
 
