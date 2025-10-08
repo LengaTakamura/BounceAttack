@@ -11,6 +11,7 @@ public class SphereEnemy : EnemyBase
     [SerializeField] private GameObject _effect; 
     
 
+    private CancellationTokenSource _cts;
     public override void EnemyOnBeat(BeatInfo info)
     {
         base.EnemyOnBeat(info);
@@ -18,13 +19,17 @@ public class SphereEnemy : EnemyBase
 
     private async UniTaskVoid StartMoving(double time,float preparationTime)
     {
-        var cts = new CancellationTokenSource();
-        await UniTask.Delay(TimeSpan.FromSeconds(time), cancellationToken: cts.Token);
-        await transform.DOJump(new Vector3(0f, 0f, 0f), jumpPower: 3f, numJumps: 3, duration: preparationTime).ToUniTask(cancellationToken: cts.Token);
+        _cts = new CancellationTokenSource();
+        await UniTask.Delay(TimeSpan.FromSeconds(time), cancellationToken: _cts.Token);
+        await transform.DOJump(new Vector3(0f, 0f, 0f), jumpPower: 3f, numJumps: 3, duration: preparationTime).ToUniTask(cancellationToken: _cts.Token);
         Instantiate(_effect, transform.position, Quaternion.identity);
         Kill();
-        cts.Cancel();
-        cts.Dispose();
+    }
+
+    private void OnDisable()
+    {
+        _cts?.Cancel();
+        _cts?.Dispose();
     }
 
     public override void Init(BeatInfo beatinfo)

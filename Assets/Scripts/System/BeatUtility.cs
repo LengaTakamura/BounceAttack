@@ -12,7 +12,7 @@ public static class BeatUtility
     /// </summary>
     public static BeatActionType JudgeBeatAction(BeatInfo info)                                        
     {
-        var nowTime = (ulong)info.Playback.GetTime() / (ulong)1000f;
+        var nowTime = (double)info.Playback.GetTime() / 1000f;
         var secondsPerBeat = info.SecondsPerBeat;
         var diffPrev = nowTime - info.PrevBeatTime;
         var diffNext = info.NextBeatTime - nowTime;
