@@ -1,26 +1,31 @@
 using CriWare;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace System
 {
     public class BeatSystem : MonoBehaviour, IBeatSyncListener
     {
         [SerializeField] private SoundManager _soundManager;
-    
+
         private CriAtomExPlayback _playback;
-    
+
         private int _count;
 
         private float _prevTime;
-        
+
         public float DefaultSecondsPerBeat => 60f / _defaultBpm;
-        
+
         [SerializeField] private int _defaultBpm = 60;
 
-        public TempoState CurrentTempo { get;private set;}
+        public TempoState CurrentTempo { get; private set; }
+
+        public int ChangeTempoBeat { get; private set; } = 50;
+        public int PrepareBeat { get; private set; } = 5;
+        public int BetweenBeats { get; private set; } = 5;
         
-        [SerializeField] private int _changeTempoBeat = 50;
+        [SerializeField] private float _waitingTime = 5f;
 
         private void Awake()
         {
@@ -36,9 +41,10 @@ namespace System
         private async UniTaskVoid Init()
         {
             CurrentTempo = TempoState.None;
-            await UniTask.Delay(TimeSpan.FromSeconds(5f));
+            PrepareBeat = 5;
+            BetweenBeats = 5;
+            await UniTask.Delay(TimeSpan.FromSeconds(_waitingTime));
             _playback = _soundManager.PlayBgm();
-            CurrentTempo = TempoState.Normal;
             if (!_playback.GetBeatSyncInfo(out CriAtomExBeatSync.Info info))
             {
                 Debug.LogWarning("PlayBackから情報を取得できません");
@@ -48,18 +54,15 @@ namespace System
         public void OnBeat(BeatInfo info)
         {
         }
+
         public BeatInfo UpdateInfo(CriAtomExBeatSync.Info info)
         {
             _count++;
-            
-            if (_count == _changeTempoBeat)
-            {
-                ChangeTempo();
-            }
+            CurrentTempo = ChangeTempo(_count);
 
             var time = (double)_playback.GetTime() / 1000f;
-            var secondsPerBeat = CurrentTempo == TempoState.Normal ? 60f / info.bpm * 2 : 60f / info.bpm;
-            
+            var secondsPerBeat = CurrentTempo is TempoState.Normal or TempoState.PrevNormal ? 60f / info.bpm * 2 : 60f / info.bpm;
+
             var copy = new BeatInfo
             {
                 Bpm = CurrentTempo == TempoState.Normal ? info.bpm / 2 : info.bpm,
@@ -71,20 +74,26 @@ namespace System
                 NextBeatTime = time + secondsPerBeat,
                 Playback = _playback,
             };
-            
+
             return copy;
         }
-    
+
         private void OnDisable()
         {
             BeatSyncDispatcher.Instance.Unregister(this);
         }
 
-        private void ChangeTempo()
+        private TempoState ChangeTempo(int count)
         {
-            CurrentTempo = TempoState.Fast;
+            if (count > ChangeTempoBeat + BetweenBeats) return TempoState.Fast;
+            if(count > ChangeTempoBeat) return TempoState.PrevFast;
+            if (count > ChangeTempoBeat - BetweenBeats) return TempoState.None;
+            if (count > PrepareBeat + BetweenBeats) return TempoState.Normal;
+            if(count > PrepareBeat) return TempoState.PrevNormal;
+            return TempoState.None;
         }
     }
+
     public struct BeatInfo
     {
         public float Bpm;
@@ -99,6 +108,10 @@ namespace System
 
     public enum TempoState
     {
-        Normal,Fast,None
+        PrevNormal,
+        Normal,
+        PrevFast,
+        Fast,
+        None
     }
 }
