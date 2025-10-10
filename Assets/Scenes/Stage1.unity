@@ -1277,9 +1277,9 @@ MonoBehaviour:
   _chart: {fileID: 7558688724970675292, guid: 396dbb05e39026949a68956b08e347d0, type: 3}
   _canvas: {fileID: 996097762}
   _targetImage: {fileID: 1118641821}
-  _count: 5
   _defaultSize: 5
   _maxSize: 10
+  _beatDelay: 4
 --- !u!4 &1132825104
 Transform:
   m_ObjectHideFlags: 0
@@ -1480,13 +1480,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1339626850}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.34506866, y: 0.6164381, z: -0.34384835, w: 0.6186276}
-  m_LocalPosition: {x: -63.47899, y: 84.01274, z: 3.6213155}
+  m_LocalRotation: {x: 0.27344593, y: 0.65209454, z: -0.27344593, w: 0.65209454}
+  m_LocalPosition: {x: -6.96, y: 17.15, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 45.5, y: 90, z: 0}
 --- !u!114 &1339626854
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2267,7 +2267,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _soundManager: {fileID: 355822104}
   _defaultBpm: 60
-  _changeTempoBeat: 50
+  _waitingTime: 5
 --- !u!4 &1997912421
 Transform:
   m_ObjectHideFlags: 0

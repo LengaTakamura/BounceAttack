@@ -67,7 +67,9 @@ namespace System
         private void ListenersOnBeat(ref CriAtomExBeatSync.Info info)
         {
             var beatInfo = _beatSystem.UpdateInfo(info); //情報の更新
-            if(_beatSystem.CurrentTempo == TempoState.Normal && beatInfo.CurrentBeat % 2 == 0) return;
+            if(_beatSystem.CurrentTempo == TempoState.Normal && beatInfo.CurrentBeat % 2 == 1) return;
+            if(_beatSystem.CurrentTempo == TempoState.PrevNormal && beatInfo.CurrentBeat % 2 == 1) return;
+            if(_beatSystem.CurrentTempo == TempoState.None) return;
             foreach (var listener in _listeners)
             {
                 listener.OnBeat(beatInfo);　// 更新された情報を各要素に注入

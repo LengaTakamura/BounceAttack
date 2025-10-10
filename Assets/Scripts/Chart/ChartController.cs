@@ -13,16 +13,16 @@ namespace Chart
         public Action OnDeath { get; set; }
         
         private CancellationTokenSource _cts;
-        public void Init(RectTransform targetRectTransform,BeatInfo beatInfo)
+        public void Init(RectTransform targetRectTransform,BeatInfo beatInfo, int delay)
         {
             _cts = new CancellationTokenSource();
             _rectTransform = GetComponent<RectTransform>();
-            Move(targetRectTransform,beatInfo.SecondsPerBeat,_cts.Token).Forget();
+            Move(targetRectTransform,beatInfo.SecondsPerBeat,_cts.Token,delay).Forget();
         }
 
-        private async UniTaskVoid Move(RectTransform targetRectTransform,float secondsPerBeat,CancellationToken token)
+        private async UniTaskVoid Move(RectTransform targetRectTransform,float secondsPerBeat,CancellationToken token, int delay)
         {
-            await _rectTransform.DOAnchorPos(targetRectTransform.anchoredPosition,secondsPerBeat * 4f).SetEase(Ease.Linear).ToUniTask(cancellationToken: token);
+            await _rectTransform.DOAnchorPos(targetRectTransform.anchoredPosition,secondsPerBeat * delay).SetEase(Ease.Linear).ToUniTask(cancellationToken: token);
             OnDeath?.Invoke();
             OnDeath = null;
         }
