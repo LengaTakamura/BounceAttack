@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Pool;
 using UnityEngine.Serialization;
@@ -21,6 +22,7 @@ namespace Chart
       private BeatInfo _beatInfo;
       private BeatSystem _beatSystem;
       [SerializeField] private int _beatDelay = 4;
+      private List<ChartController> _activeCharts = new List<ChartController>();
       private void Awake()
       {
          BeatSyncDispatcher.Instance.Register(this);
@@ -44,6 +46,8 @@ namespace Chart
          );
          _initialPosition = _chart.GetComponent<RectTransform>().anchoredPosition;
          _beatSystem = BeatSyncDispatcher.Instance.Get<BeatSystem>();
+         _beatDelay = _beatSystem.BetweenBeats;
+         _beatSystem.OnBreak += HideChart;
       }
 
       private ChartController InstantiateChart()
@@ -58,10 +62,12 @@ namespace Chart
          chart.gameObject.SetActive(true);
          chart.Init(_targetImage.rectTransform,_beatInfo,_beatDelay);
          chart.OnDeath += () => _chartImagePool.Release(chart);
+         _activeCharts.Add(chart);
       }
 
       private void ReleaseChart(ChartController chart)
       {
+         _activeCharts.Remove(chart);
          chart.gameObject.SetActive(false);
       }
 
@@ -79,6 +85,15 @@ namespace Chart
       private void GetPool()
       {
          _chartImagePool.Get();
+      }
+
+      private void HideChart()
+      {
+         foreach (var chartController in _activeCharts.ToArray())
+         {
+            chartController.gameObject.SetActive(false);
+         }
+         _activeCharts.Clear();
       }
 
       private void OnDestroy()
