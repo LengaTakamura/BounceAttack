@@ -3,6 +3,7 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class SphereEnemy : EnemyBase
 {
@@ -10,7 +11,8 @@ public class SphereEnemy : EnemyBase
 
     [SerializeField] private GameObject _effect; 
     
-
+    [SerializeField] private int _preparationBeat = 3;
+    
     private CancellationTokenSource _cts;
     public override void EnemyOnBeat(BeatInfo info)
     {
@@ -35,7 +37,8 @@ public class SphereEnemy : EnemyBase
     public override void Init(BeatInfo beatinfo)
     {
         base.Init(beatinfo);
-        var time = BeatUtility.TimeUntilBeat(beatinfo, 3f, 5);
-        StartMoving(time,3f).Forget();
+        var preparationTime = beatinfo.SecondsPerBeat * _preparationBeat;
+        var time = BeatUtility.TimeUntilBeat(beatinfo,preparationTime, 5);
+        StartMoving(time,preparationTime).Forget();
     }
 }

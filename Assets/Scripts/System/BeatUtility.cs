@@ -34,7 +34,7 @@ public static class BeatUtility
 
     public static double TimeUntilBeat(BeatInfo info, float preparationTime, int beatOffset)
     {
-        var nowTime = info.NowTime;
+        var nowTime = (double)info.Playback.GetTime() / 1000f;
         var targetTime = info.SecondsPerBeat * (info.CurrentBeat + beatOffset);
         var startTime = targetTime - preparationTime;
         var waitTime = (double)startTime - nowTime;
