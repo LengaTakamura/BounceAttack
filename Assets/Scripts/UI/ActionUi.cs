@@ -18,7 +18,7 @@ namespace UI
         public override void Init(GameEvents gameEvents)
         {
             _text = GetComponent<TextMeshProUGUI>();
-            gameEvents.OnInputAction.Subscribe(actionType => OnActionTriggered(actionType)).AddTo(this);
+            gameEvents.OnInputAction.Subscribe(OnActionTriggered).AddTo(this);
         }
 
         public override void UIOnBeat(BeatInfo info)
