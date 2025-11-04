@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public class PlayerManager : MonoBehaviour
@@ -24,5 +23,10 @@ public class PlayerManager : MonoBehaviour
     {
         var array = new Collider[100];
         var count = Physics.OverlapSphereNonAlloc(transform.position, _attackRadius, array, _enemyLayerMask);
+        for (int i = 0; i < count; i++)
+        {
+            if(!array[i].gameObject.TryGetComponent(out EnemyBase enemyBase)) return;
+            enemyBase.KillEnemy();
+        }
     }
 }
