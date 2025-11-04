@@ -3,12 +3,13 @@ using UnityEngine;
 
 public class EnemyBase : MonoBehaviour
 {
-    [SerializeField] private float _score;
+    [SerializeField] private int _score;
 
     private Action _onDeath;
     
     private float _timer;
-    
+
+    [SerializeField] private int _damageAmount;
     void Awake()
     {
     }
@@ -24,7 +25,7 @@ public class EnemyBase : MonoBehaviour
        
     }
 
-    public virtual void Init(BeatInfo beatinfo)
+    public virtual void Init(BeatInfo beatInfo)
     {
         
     }
@@ -34,27 +35,25 @@ public class EnemyBase : MonoBehaviour
         _onDeath += release;
     }
     
-    public virtual float Kill()
+    protected void Suicide()
+    {
+        _onDeath?.Invoke();
+        _onDeath = null;
+    }
+
+    public int KillEnemy()
     {
         _onDeath?.Invoke();
         _onDeath = null;
         return _score;
+    } 
+    public virtual void OnAttack(PlayerManager player)
+    {
+        player.TakeDamage(_damageAmount);
     }
-    
-}
 
-public interface IDamageable
-{
-    float MaxHealth { get; set; }
-
-    float CurrentHealth { get; set; }
-
-    void HitDamage(float damage);
-
-    void HitHeal(float value);
-
-    void Kill();
-
-    float AttackPower {  get; set; }
-    
+    public int GetDamageAmount()
+    {
+        return _damageAmount;
+    }
 }

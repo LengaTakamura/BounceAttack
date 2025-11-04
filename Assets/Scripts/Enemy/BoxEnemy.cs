@@ -16,9 +16,9 @@ namespace Enemy
         [SerializeField] private int _delay = 10;
         
         private CancellationTokenSource _cts;
-        public override void Init(BeatInfo beatinfo)
+        public override void Init(BeatInfo beatInfo)
         {
-            Move(beatinfo.SecondsPerBeat).Forget();
+            Move(beatInfo.SecondsPerBeat).Forget();
             _count = -1;
         }
 
@@ -29,7 +29,7 @@ namespace Enemy
             var randomZ = Random.Range(0f, 10f);
             _cts = new CancellationTokenSource();
             await transform.DOLocalMove(new Vector3(randomX, randomY, randomZ), secondsPerBeat * _delay).SetEase(Ease.Linear).ToUniTask(cancellationToken: _cts.Token);
-            Kill();
+            Suicide();
         }
         public override void EnemyOnBeat(BeatInfo info)
         {
@@ -54,6 +54,13 @@ namespace Enemy
         {
             _cts?.Cancel();
             _cts?.Dispose();
+        }
+
+        private void OnCollisionEnter(Collision other)
+        {
+            if (!other.gameObject.TryGetComponent(out PlayerManager playerHealth)) return;
+            OnAttack(playerHealth);
+            Suicide();
         }
     }
 }
