@@ -149,6 +149,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a17aa989e9b9d5946af6cf19674ac318, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _score: 0
+  _score: 100
+  _damageAmount: 10
   _effect: {fileID: 2433282508537954060, guid: 3ef3ae421f71c5c4e97fe12dc2fc6312, type: 3}
   _preparationBeat: 3
+  _radius: 1
+  _playerLayerMask:
+    serializedVersion: 2
+    m_Bits: 256
