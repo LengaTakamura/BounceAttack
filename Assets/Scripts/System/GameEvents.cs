@@ -15,7 +15,7 @@ namespace System
         public ReadOnlyReactiveProperty<int> CurrentScore => _currentScore;
 
         private readonly Subject<BeatActionType> _onInputAction = new();
-        public R3.Observable<BeatActionType> OnInputAction => _onInputAction;
+        public Observable<BeatActionType> OnInputAction => _onInputAction;
         #endregion 
 
         private void Awake()

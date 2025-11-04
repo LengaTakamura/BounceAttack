@@ -36,6 +36,6 @@ namespace UI
 
     public enum UiType
     {
-        Score,InputAction,Time,Enemy,None
+        Score,InputAction,Player,Time,Enemy,None
     }
 }

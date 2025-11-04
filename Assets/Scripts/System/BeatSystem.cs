@@ -21,15 +21,19 @@ namespace System
 
         public TempoState CurrentTempo { get; private set; }
 
-        public int ChangeTempoBeat { get; private set; } = 50;
+        public int ChangeTempoBeat { get; private set; } = 40;
         public int PrepareBeat { get; private set; } = 5;
-        public int BetweenBeats { get; private set; } = 5;
+        public int BetweenBeats { get; private set; }
         
         [SerializeField] private float _waitingTime = 5f;
+
+        public Action OnBreak;
 
         private void Awake()
         {
             BeatSyncDispatcher.Instance.Register(this);
+            BetweenBeats = 4;
+            PrepareBeat = 6;
         }
 
         private void Start()
@@ -41,8 +45,6 @@ namespace System
         private async UniTaskVoid Init()
         {
             CurrentTempo = TempoState.None;
-            PrepareBeat = 5;
-            BetweenBeats = 5;
             await UniTask.Delay(TimeSpan.FromSeconds(_waitingTime));
             _playback = _soundManager.PlayBgm();
             if (!_playback.GetBeatSyncInfo(out CriAtomExBeatSync.Info info))
@@ -85,11 +87,15 @@ namespace System
 
         private TempoState ChangeTempo(int count)
         {
-            if (count > ChangeTempoBeat + BetweenBeats) return TempoState.Fast;
-            if(count > ChangeTempoBeat) return TempoState.PrevFast;
-            if (count > ChangeTempoBeat - BetweenBeats) return TempoState.None;
-            if (count > PrepareBeat + BetweenBeats) return TempoState.Normal;
-            if(count > PrepareBeat) return TempoState.PrevNormal;
+            if (count >= ChangeTempoBeat + BetweenBeats) return TempoState.Fast;
+            if(count >= ChangeTempoBeat) return TempoState.PrevFast;
+            if (count >= ChangeTempoBeat - BetweenBeats)
+            {
+                OnBreak?.Invoke();
+                return TempoState.None;
+            }
+            if (count >= PrepareBeat + BetweenBeats * 2) return TempoState.Normal;
+            if(count >= PrepareBeat) return TempoState.PrevNormal;
             return TempoState.None;
         }
     }

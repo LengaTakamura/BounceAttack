@@ -1,13 +1,9 @@
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.Serialization;
 
-public class PlayerMoveDemo : MonoBehaviour
+public class PlayerMove : MonoBehaviour
 {
     private Rigidbody _rigidbody;
     [SerializeField]
@@ -23,7 +19,6 @@ public class PlayerMoveDemo : MonoBehaviour
     [SerializeField] private float _blinkCoolTime;
     [SerializeField] private float _blinkTime;
     private CancellationTokenSource _cts;
-    private float _lerpTime;
     [SerializeField] private InputManager _inputManager;
     private void Start()
     {
@@ -81,7 +76,6 @@ public class PlayerMoveDemo : MonoBehaviour
     private void Blink()
     {
         if (_inputManager.CurrentInputType != InputType.Blink || !_canBlink) return;
-        _lerpTime = 0;
         var velo = _rigidbody.linearVelocity.normalized;
         velo.y = 0;
         if (velo == Vector3.zero)
@@ -107,7 +101,7 @@ public class PlayerMoveDemo : MonoBehaviour
         }
         _canBlink = true;
     } 
-
+    
     private float SetJumpForce(int jumpCount)
     {
         return _jumpForceList[jumpCount - 1];

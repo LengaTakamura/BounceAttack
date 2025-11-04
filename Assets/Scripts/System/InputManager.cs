@@ -38,17 +38,17 @@ namespace System
             {
                 case InputType.Spase:
                     var typeSpase = BeatUtility.JudgeBeatAction(_info);
-                    _gameEvents.AddScore((int)Score(InputType.Spase, typeSpase));
+                    _gameEvents.AddScore((int)GetScore(InputType.Spase, typeSpase));
                     _gameEvents.UpdateInputAction(typeSpase);
                     break;
                 case InputType.Attack:
                     var typeAttack = BeatUtility.JudgeBeatAction(_info);
-                    _gameEvents.AddScore((int)Score(InputType.Attack, typeAttack));
+                    _gameEvents.AddScore((int)GetScore(InputType.Attack, typeAttack));
                     _gameEvents.UpdateInputAction(typeAttack);
                     break;
                 case InputType.Blink:
                     var typeBlink = BeatUtility.JudgeBeatAction(_info);
-                    _gameEvents.AddScore((int)Score(InputType.Blink, typeBlink));
+                    _gameEvents.AddScore((int)GetScore(InputType.Blink, typeBlink));
                     _gameEvents.UpdateInputAction(typeBlink);
                     break;
                 case InputType.None:
@@ -58,7 +58,7 @@ namespace System
             }
         }
 
-        private float Score(InputType inputType, BeatActionType actionType)
+        private float GetScore(InputType inputType, BeatActionType actionType)
         {
             switch (actionType)
             {
