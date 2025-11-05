@@ -15,10 +15,10 @@ namespace UI
 
         [SerializeField] private float _fadeTime = 0.25f;
 
-        public override void Init(GameEvents gameEvents)
+        public override void Init(Presenter presenter)
         {
             _text = GetComponent<TextMeshProUGUI>();
-            gameEvents.OnInputAction.Subscribe(OnActionTriggered).AddTo(this);
+            presenter.OnInputAction.Subscribe(OnActionTriggered).AddTo(this);
         }
 
         public override void UIOnBeat(BeatInfo info)
