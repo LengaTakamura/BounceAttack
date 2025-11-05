@@ -8,6 +8,7 @@ namespace System
     {
         [SerializeField] private InputManager _inputManager;
         [SerializeField] private UiManager _uiManager;
+        [SerializeField] private PlayerManager _playerManager;
         
         private readonly CompositeDisposable _disposables = new();
         
@@ -17,9 +18,12 @@ namespace System
         
         public Observable<BeatActionType> OnInputAction => _inputManager.OnInputAction;
 
+        public Observable<Unit> OnAttack => _inputManager.OnAttack;
+
         private void Start()
         {
             _uiManager.Init(this);
+            OnAttack.Subscribe(_ => _playerManager.AttackEnemies()).AddTo(this);
         }
 
 

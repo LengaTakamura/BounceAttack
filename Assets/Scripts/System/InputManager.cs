@@ -21,6 +21,10 @@ namespace System
 
         private readonly Subject<BeatActionType> _onInputAction = new();
         public Observable<BeatActionType> OnInputAction => _onInputAction;
+        
+        private readonly Subject<Unit> _onAttack = new();
+
+        public Observable<Unit> OnAttack => _onAttack;
         #endregion 
 
         private void Start()
@@ -55,6 +59,7 @@ namespace System
                     var typeAttack = BeatUtility.JudgeBeatAction(_info);
                     AddScore((int)GetScore(InputType.Attack, typeAttack));
                     UpdateInputAction(typeAttack);
+                    _onAttack?.OnNext(Unit.Default);
                     break;
                 case InputType.Blink:
                     var typeBlink = BeatUtility.JudgeBeatAction(_info);

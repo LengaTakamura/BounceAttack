@@ -457,7 +457,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 2030586661, guid: ce8bb55a53a3cef4f90f0810444cc9da, type: 3}
+  m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
   m_Type: 3
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -2206,7 +2206,7 @@ RectTransform:
   m_GameObject: {fileID: 1906718919}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.88, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 281443913}
@@ -2269,6 +2269,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   <UiType>k__BackingField: 2
+  _burnImage: {fileID: 281443914}
+  _healthImage: {fileID: 1907976904}
+  _duration: 0.5
 --- !u!1 &1907976902
 GameObject:
   m_ObjectHideFlags: 0
@@ -2326,7 +2329,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 2030586661, guid: ce8bb55a53a3cef4f90f0810444cc9da, type: 3}
+  m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
   m_Type: 3
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -2711,7 +2714,7 @@ GameObject:
   - component: {fileID: 2013133452}
   - component: {fileID: 2013133451}
   m_Layer: 0
-  m_Name: GameEvents
+  m_Name: Presenter
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2729,6 +2732,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 332f04a50d72443468fd43ff83f522f3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _inputManager: {fileID: 1909977610}
+  _uiManager: {fileID: 873405013}
+  _playerManager: {fileID: 1467109380}
 --- !u!4 &2013133452
 Transform:
   m_ObjectHideFlags: 0
