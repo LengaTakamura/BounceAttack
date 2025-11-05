@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using R3;
 using UnityEngine;
 
 namespace System
@@ -10,12 +11,25 @@ namespace System
         private float _nextBeatTime;
         public InputType CurrentInputType { get; private set; }
         [SerializeField] private SerializableDictionary<InputType, int> _baseScores = new();
-        private GameEvents _gameEvents;
         
+        #region イベント
+        private readonly ReactiveProperty<int> _currentScore = new(0);
+        public ReadOnlyReactiveProperty<int> CurrentScore => _currentScore;
+        
+        private readonly Subject<int> _scoreChanged = new();
+        public Observable<int> ScoreChanged => _scoreChanged; 
+
+        private readonly Subject<BeatActionType> _onInputAction = new();
+        public Observable<BeatActionType> OnInputAction => _onInputAction;
+        
+        private readonly Subject<Unit> _onAttack = new();
+
+        public Observable<Unit> OnAttack => _onAttack;
+        #endregion 
+
         private void Start()
         {
             BeatSyncDispatcher.Instance.Register(this);
-            _gameEvents = GameEvents.Instance;
         }
 
         private void Update()
@@ -38,24 +52,36 @@ namespace System
             {
                 case InputType.Spase:
                     var typeSpase = BeatUtility.JudgeBeatAction(_info);
-                    _gameEvents.AddScore((int)GetScore(InputType.Spase, typeSpase));
-                    _gameEvents.UpdateInputAction(typeSpase);
+                    AddScore((int)GetScore(InputType.Spase, typeSpase));
+                    UpdateInputAction(typeSpase);
                     break;
                 case InputType.Attack:
                     var typeAttack = BeatUtility.JudgeBeatAction(_info);
-                    _gameEvents.AddScore((int)GetScore(InputType.Attack, typeAttack));
-                    _gameEvents.UpdateInputAction(typeAttack);
+                    AddScore((int)GetScore(InputType.Attack, typeAttack));
+                    UpdateInputAction(typeAttack);
+                    _onAttack?.OnNext(Unit.Default);
                     break;
                 case InputType.Blink:
                     var typeBlink = BeatUtility.JudgeBeatAction(_info);
-                    _gameEvents.AddScore((int)GetScore(InputType.Blink, typeBlink));
-                    _gameEvents.UpdateInputAction(typeBlink);
+                    AddScore((int)GetScore(InputType.Blink, typeBlink));
+                    UpdateInputAction(typeBlink);
                     break;
                 case InputType.None:
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+        }
+        
+        private void AddScore(int amount)
+        {
+            _currentScore.Value += amount;
+            _scoreChanged.OnNext(amount);
+        }
+        
+        private void UpdateInputAction(BeatActionType action)
+        {
+            _onInputAction.OnNext(action);
         }
 
         private float GetScore(InputType inputType, BeatActionType actionType)

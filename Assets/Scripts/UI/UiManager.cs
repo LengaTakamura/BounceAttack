@@ -6,17 +6,17 @@ namespace UI
 {
     public class UiManager : MonoBehaviour,IBeatSyncListener
     {
-        
        [SerializeField] private List<UiBase> _uiObjects = new();
-       
-        private GameEvents _gameEvents;
-        private void Start()
+        private void Awake()
         {
             BeatSyncDispatcher.Instance.Register(this);
-            _gameEvents = GameEvents.Instance;
+        }
+
+        public void Init(Presenter presenter)
+        {
             foreach (var uiObject in _uiObjects)
             {
-                UiObjectsInit(uiObject);
+                uiObject.Init(presenter);
             }
         }
 
@@ -27,11 +27,7 @@ namespace UI
                 uiObject.UIOnBeat(info);
             }
         }
-
-        private void UiObjectsInit(UiBase ui)
-        {
-           ui.Init(_gameEvents);
-        }
+        
     }
 
     public enum UiType
