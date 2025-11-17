@@ -457,7 +457,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
+  m_Sprite: {fileID: 2030586661, guid: ce8bb55a53a3cef4f90f0810444cc9da, type: 3}
   m_Type: 3
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -646,7 +646,7 @@ GameObject:
   m_Component:
   - component: {fileID: 555279548}
   m_Layer: 0
-  m_Name: Col
+  m_Name: Wall
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1708,7 +1708,7 @@ PrefabInstance:
       objectReference: {fileID: 2100000, guid: c2e40fa84d53ccd428f640eac126b1fb, type: 2}
     - target: {fileID: 4357221320041930121, guid: e52cddba67a6a9041922d7467f6270dc, type: 3}
       propertyPath: m_Name
-      value: PlayerDemo
+      value: Player
       objectReference: {fileID: 0}
     - target: {fileID: 4357221320041930121, guid: e52cddba67a6a9041922d7467f6270dc, type: 3}
       propertyPath: m_Layer
@@ -1789,7 +1789,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _maxHealth: 100
-  _attackRadius: 1
+  _attackRadius: 5
   _enemyLayerMask:
     serializedVersion: 2
     m_Bits: 128
@@ -2215,7 +2215,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: -469.7, y: 453.95}
   m_SizeDelta: {x: 500, y: 75}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1906718921
@@ -2329,7 +2329,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
+  m_Sprite: {fileID: 2030586661, guid: ce8bb55a53a3cef4f90f0810444cc9da, type: 3}
   m_Type: 3
   m_PreserveAspect: 0
   m_FillCenter: 1
