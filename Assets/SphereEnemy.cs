@@ -3,6 +3,7 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using NaughtyAttributes;
+using Player;
 using UnityEngine;
 
 public class SphereEnemy : EnemyBase

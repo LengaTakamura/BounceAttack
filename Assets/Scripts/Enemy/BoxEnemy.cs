@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
+using Player;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -56,7 +57,7 @@ namespace Enemy
             _cts?.Dispose();
         }
 
-        private void OnCollisionEnter(Collision other)
+        private void OnTriggerEnter(Collider other)
         {
             if (!other.gameObject.TryGetComponent(out PlayerManager playerHealth)) return;
             OnAttack(playerHealth);
