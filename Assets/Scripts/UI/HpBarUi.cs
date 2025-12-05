@@ -1,5 +1,7 @@
 using System;
+using Cysharp.Threading.Tasks;
 using DG.Tweening;
+using R3;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -19,17 +21,12 @@ namespace UI
         {
             _burnImage.fillAmount = 1f;
             _healthImage.fillAmount = 1f;
+            _health = presenter.Health;
+            _maxHealth = presenter.Health;
+            presenter.OnHit.Subscribe(TakeDamage).AddTo(this);
         }
-
-        private void Update()
-        {
-            if (Input.GetKeyDown(KeyCode.Space))
-            {
-                TakeDamage(_debugDamage);
-            }
-        }
-
-        private void TakeDamage(float damage)
+        
+        private void TakeDamage(int damage)
         {
             SetGauge((_health - damage) / _maxHealth);
             _health -= damage;
