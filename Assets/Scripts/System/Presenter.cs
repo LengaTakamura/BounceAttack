@@ -11,6 +11,8 @@ namespace System
         [SerializeField] private UiManager _uiManager;
         [SerializeField] private PlayerManager _playerManager;
         
+        public int Health => _playerManager.CurrentHealth;
+        
         private readonly CompositeDisposable _disposables = new();
         
         public ReadOnlyReactiveProperty<int> CurrentScore => _inputManager.CurrentScore;
@@ -20,7 +22,9 @@ namespace System
         public Observable<BeatActionType> OnInputAction => _inputManager.OnInputAction;
 
         public Observable<Unit> OnAttack => _inputManager.OnAttack;
-
+        
+        public Observable<int> OnHit => _playerManager.OnHit;
+        
         private void Start()
         {
             _uiManager.Init(this);

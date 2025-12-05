@@ -6,6 +6,8 @@ namespace Player
     public class PlayerManager : MonoBehaviour
     {
         private int _currentHealth;
+        
+        public int CurrentHealth => _currentHealth;
 
         [SerializeField] private int _maxHealth;
 
@@ -13,8 +15,8 @@ namespace Player
     
         [SerializeField] private LayerMask _enemyLayerMask;
     
-        private readonly Subject<Unit> _onHit = new();
-        public Observable<Unit> OnHit => _onHit;
+        private readonly Subject<int> _onHit = new();
+        public Observable<int> OnHit => _onHit;
         private void Awake()
         {
             _currentHealth = _maxHealth;
@@ -23,7 +25,7 @@ namespace Player
         public void TakeDamage(int damage)
         {
             _currentHealth -= damage;
-            _onHit?.OnNext(Unit.Default);
+            _onHit?.OnNext(damage);
         }
 
         public void AttackEnemies()
