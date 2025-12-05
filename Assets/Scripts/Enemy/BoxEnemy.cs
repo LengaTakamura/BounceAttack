@@ -59,8 +59,8 @@ namespace Enemy
 
         private void OnTriggerEnter(Collider other)
         {
-            if (!other.gameObject.TryGetComponent(out PlayerManager playerHealth)) return;
-            OnAttack(playerHealth);
+            if (!other.gameObject.TryGetComponent(out PlayerManager playerManager)) return;
+            OnAttack(playerManager);
             Suicide();
         }
     }
