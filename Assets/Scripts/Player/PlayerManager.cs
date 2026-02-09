@@ -17,13 +17,17 @@ namespace Player
     
         private readonly Subject<int> _onHit = new();
         public Observable<int> OnHit => _onHit;
+
+        private PlayerMove _move;
         private void Awake()
         {
             _currentHealth = _maxHealth;
+            _move = GetComponent<PlayerMove>();
         }
 
         public void TakeDamage(int damage)
         {
+            if (_move.IsBlinking) return; 
             _currentHealth -= damage;
             _onHit?.OnNext(damage);
         }
