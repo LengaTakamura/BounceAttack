@@ -14,7 +14,6 @@ namespace UI
         [SerializeField] private float _duration = 0.5f;
         private float _strength = 20f;
         private int _vibrate = 100;
-        private float _debugDamage = 10f;
         private float _health = 100f;
         private float _maxHealth = 100f;
         public override void Init(Presenter presenter)

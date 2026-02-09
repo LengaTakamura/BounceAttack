@@ -13,7 +13,6 @@ public class EnemySpawner : MonoBehaviour, IBeatSyncListener
     [SerializeField] private int _maxSize;
     private Action<BeatInfo> _onBeatAction;
     private BeatInfo _beatInfo;
-    private BeatSystem _beatSystem;
 
     private void Awake()
     {
@@ -70,7 +69,7 @@ public class EnemySpawner : MonoBehaviour, IBeatSyncListener
         _onBeatAction?.Invoke(_beatInfo);
         if ((int)_beatInfo.BeatCount % 3 == 0)
         {
-            if(_beatInfo.CurrentBeat < 10) return;
+            //if(_beatInfo.CurrentBeat < 10) return;
             DebugWave();
         }
     }
