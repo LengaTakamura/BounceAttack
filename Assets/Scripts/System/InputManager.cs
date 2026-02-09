@@ -7,10 +7,9 @@ namespace System
     public class InputManager : MonoBehaviour, IBeatSyncListener
     {
         BeatInfo _info;
-        private float _prevBeatTime;
-        private float _nextBeatTime;
         public InputType CurrentInputType { get; private set; }
         [SerializeField] private SerializableDictionary<InputType, int> _baseScores = new();
+        private BeatSystem _beatSystem;
         
         #region イベント
         private readonly ReactiveProperty<int> _currentScore = new(0);
@@ -30,6 +29,7 @@ namespace System
         private void Start()
         {
             BeatSyncDispatcher.Instance.Register(this);
+            _beatSystem = BeatSyncDispatcher.Instance.Get<BeatSystem>();
         }
 
         private void Update()
@@ -40,6 +40,8 @@ namespace System
 
         private InputType GetInputType()
         {
+            if(_beatSystem == null) return InputType.None;
+            if (_beatSystem.IsWaiting) return InputType.None;
             if (Input.GetKeyDown(KeyCode.Space)) return InputType.Spase;
             if (Input.GetMouseButtonDown(0)) return InputType.Attack;
             if (Input.GetMouseButtonDown(1)) return InputType.Blink;
