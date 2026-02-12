@@ -1,4 +1,5 @@
 using System;
+using Player;
 using UnityEngine;
 
 public class EnemyBase : MonoBehaviour
@@ -10,14 +11,18 @@ public class EnemyBase : MonoBehaviour
     private float _timer;
 
     [SerializeField] private int _damageAmount;
+
+    [SerializeField] private float _speed;
+
+    private bool _dead = true;
     void Awake()
     {
+       
     }
     
 
     private void Update()
     {
-       
     }
 
     public virtual void EnemyOnBeat(BeatInfo info)
@@ -33,16 +38,21 @@ public class EnemyBase : MonoBehaviour
     public void InitOnPool(Action release)
     {
         _onDeath += release;
+        _dead = false;
     }
     
     protected void Suicide()
     {
+        if (_dead) return;
+        _dead = true;
         _onDeath?.Invoke();
         _onDeath = null;
     }
 
     public int KillEnemy()
     {
+        if (_dead) return 0;
+        _dead = true;
         _onDeath?.Invoke();
         _onDeath = null;
         return _score;
@@ -55,5 +65,11 @@ public class EnemyBase : MonoBehaviour
     public int GetDamageAmount()
     {
         return _damageAmount;
+    }
+
+    public virtual void Move(Vector3 destination)
+    {
+        var vect = (destination - transform.position).normalized;
+        transform.Translate(vect * _speed);
     }
 }

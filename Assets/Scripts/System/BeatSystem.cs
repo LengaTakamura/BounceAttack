@@ -1,7 +1,6 @@
 using CriWare;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace System
 {
@@ -12,8 +11,6 @@ namespace System
         private CriAtomExPlayback _playback;
 
         private int _count;
-
-        private float _prevTime;
 
         public float DefaultSecondsPerBeat => 60f / _defaultBpm;
 
@@ -29,17 +26,24 @@ namespace System
 
         public Action OnBreak;
 
+        private bool _once;
+
+        private bool _isWaiting;
+
+        public bool IsWaiting {  get { return _isWaiting; } }
         private void Awake()
         {
             BeatSyncDispatcher.Instance.Register(this);
             BetweenBeats = 4;
             PrepareBeat = 6;
+            _isWaiting = true;
+            _once = false;
+            _count = -1;
         }
 
         private void Start()
         {
             Init().Forget();
-            _count = -1;
         }
 
         private async UniTaskVoid Init()
@@ -61,7 +65,7 @@ namespace System
         {
             _count++;
             CurrentTempo = ChangeTempo(_count);
-
+            _isWaiting = CurrentTempo != TempoState.Normal && CurrentTempo != TempoState.Fast;
             var time = (double)_playback.GetTime() / 1000f;
             var secondsPerBeat = CurrentTempo is TempoState.Normal or TempoState.PrevNormal ? 60f / info.bpm * 2 : 60f / info.bpm;
 
@@ -87,14 +91,20 @@ namespace System
 
         private TempoState ChangeTempo(int count)
         {
-            if (count >= ChangeTempoBeat + BetweenBeats) return TempoState.Fast;
+            if (count >= ChangeTempoBeat + BetweenBeats - 1) return TempoState.Fast; // １テンポ目をとりやすくすためにー１
             if(count >= ChangeTempoBeat) return TempoState.PrevFast;
             if (count >= ChangeTempoBeat - BetweenBeats)
             {
-                OnBreak?.Invoke();
+                if (!_once)
+                {
+                    OnBreak?.Invoke();
+                    _once = true;
+                    return TempoState.None;
+                }
                 return TempoState.None;
+                
             }
-            if (count >= PrepareBeat + BetweenBeats * 2) return TempoState.Normal;
+            if (count >= PrepareBeat + BetweenBeats * 2 - 1 ) return TempoState.Normal; // 準備期間は長く １テンポ目をとりやすくすためにー１
             if(count >= PrepareBeat) return TempoState.PrevNormal;
             return TempoState.None;
         }

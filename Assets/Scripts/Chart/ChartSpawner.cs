@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Pool;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace Chart
@@ -16,6 +15,7 @@ namespace Chart
       [SerializeField] private Image _targetImage;
       
       private ObjectPool<ChartController> _chartImagePool;
+
       [SerializeField] private int _defaultSize;
       [SerializeField] private int _maxSize;
       private Vector2 _initialPosition;

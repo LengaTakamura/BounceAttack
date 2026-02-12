@@ -2,7 +2,6 @@ using System;
 using DG.Tweening;
 using R3;
 using TMPro;
-using UnityEngine;
 
 namespace UI
 {

@@ -1,32 +1,47 @@
+using R3;
 using UnityEngine;
 
-public class PlayerManager : MonoBehaviour
+namespace Player
 {
-    private int _currentHealth;
+    public class PlayerManager : MonoBehaviour
+    {
+        private int _currentHealth;
+        
+        public int CurrentHealth => _currentHealth;
 
-    [SerializeField] private int _maxHealth;
+        [SerializeField] private int _maxHealth;
 
-    [SerializeField] private float _attackRadius;
+        [SerializeField] private float _attackRadius;
     
-    [SerializeField] private LayerMask _enemyLayerMask;
-    private void Awake()
-    {
-        _currentHealth = _maxHealth;
-    }
+        [SerializeField] private LayerMask _enemyLayerMask;
+    
+        private readonly Subject<int> _onHit = new();
+        public Observable<int> OnHit => _onHit;
 
-    public void TakeDamage(int damage)
-    {
-        _currentHealth -= damage;
-    }
-
-    public void AttackEnemies()
-    {
-        var array = new Collider[100];
-        var count = Physics.OverlapSphereNonAlloc(transform.position, _attackRadius, array, _enemyLayerMask);
-        for (int i = 0; i < count; i++)
+        private PlayerMove _move;
+        private void Awake()
         {
-            if(!array[i].gameObject.TryGetComponent(out EnemyBase enemyBase)) return;
-            enemyBase.KillEnemy();
+            _currentHealth = _maxHealth;
+            _move = GetComponent<PlayerMove>();
         }
+
+        public void TakeDamage(int damage)
+        {
+            if (_move.IsBlinking) return; 
+            _currentHealth -= damage;
+            _onHit?.OnNext(damage);
+        }
+
+        public void AttackEnemies()
+        {
+            var array = new Collider[100];
+            var count = Physics.OverlapSphereNonAlloc(transform.position, _attackRadius, array, _enemyLayerMask);
+            for (int i = 0; i < count; i++)
+            {
+                if(!array[i].gameObject.TryGetComponent(out EnemyBase enemyBase)) return;
+                enemyBase.KillEnemy();
+            }
+        }
+    
     }
 }

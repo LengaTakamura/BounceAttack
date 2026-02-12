@@ -9,7 +9,6 @@ public class PlayerMove : MonoBehaviour
     [SerializeField]
     private float _rayCastMaxDistance;
 
-    private bool _isGround;
     [SerializeField] private float _speed;
     [SerializeField]private LayerMask _groundLayer;
     private int _jumpCount;
@@ -20,6 +19,10 @@ public class PlayerMove : MonoBehaviour
     [SerializeField] private float _blinkTime;
     private CancellationTokenSource _cts;
     [SerializeField] private InputManager _inputManager;
+
+    private bool _isBlinking;
+
+    public bool IsBlinking { get { return _isBlinking;} }
     private void Start()
     {
         _rigidbody = GetComponent<Rigidbody>();
@@ -61,15 +64,10 @@ public class PlayerMove : MonoBehaviour
         var hit = Physics.Raycast(transform.position, Vector3.down,_rayCastMaxDistance, _groundLayer);
         if (hit)
         {
-            _isGround = true;
             if (_jumpCount >= _jumpForceList.Length)
             {
                 _jumpCount = 0;
             }
-        }
-        else
-        {
-            _isGround = false;
         }
     }
 
@@ -92,12 +90,21 @@ public class PlayerMove : MonoBehaviour
         float t = 0;
         var target = transform.position + velo * _blinkPower;
         var start = transform.position;
-        while (t < 0.8)
+        _isBlinking = true;
+        try
         {
-            currentTime += Time.deltaTime;
-            t = Mathf.Clamp01(currentTime / _blinkTime);
-            transform.position = Vector3.Lerp(start,target, t);
-            await UniTask.Yield( PlayerLoopTiming.Update, cancellationToken: _cts.Token);
+            while (t < 0.8f) // 1.0だと最後減速するので速度をなるべく保ったまま終了することでキレのある動きに
+            {
+                currentTime += Time.deltaTime;
+                t = Mathf.Clamp01(currentTime / _blinkTime);
+                transform.position = Vector3.Lerp(start, target, t);
+                await UniTask.Yield(PlayerLoopTiming.Update, cancellationToken: _cts.Token);
+            }
+        }
+        finally
+        {
+            // finallyに入れることで、キャンセル時も確実にフラグが戻る
+            _isBlinking = false;
         }
         _canBlink = true;
     } 
