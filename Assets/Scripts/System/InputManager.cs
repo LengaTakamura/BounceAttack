@@ -35,13 +35,12 @@ namespace System
         private void Update()
         {
             CurrentInputType = GetInputType();
+            if(_beatSystem.IsWaiting) return;
             InputHandler();
         }
 
         private InputType GetInputType()
         {
-            if(_beatSystem == null) return InputType.None;
-            if (_beatSystem.IsWaiting) return InputType.None;
             if (Input.GetKeyDown(KeyCode.Space)) return InputType.Spase;
             if (Input.GetMouseButtonDown(0)) return InputType.Attack;
             if (Input.GetMouseButtonDown(1)) return InputType.Blink;

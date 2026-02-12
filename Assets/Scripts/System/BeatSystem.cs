@@ -91,7 +91,7 @@ namespace System
 
         private TempoState ChangeTempo(int count)
         {
-            if (count >= ChangeTempoBeat + BetweenBeats) return TempoState.Fast;
+            if (count >= ChangeTempoBeat + BetweenBeats - 1) return TempoState.Fast; // １テンポ目をとりやすくすためにー１
             if(count >= ChangeTempoBeat) return TempoState.PrevFast;
             if (count >= ChangeTempoBeat - BetweenBeats)
             {
@@ -104,7 +104,7 @@ namespace System
                 return TempoState.None;
                 
             }
-            if (count >= PrepareBeat + BetweenBeats * 2) return TempoState.Normal; // 準備期間は長く
+            if (count >= PrepareBeat + BetweenBeats * 2 - 1 ) return TempoState.Normal; // 準備期間は長く １テンポ目をとりやすくすためにー１
             if(count >= PrepareBeat) return TempoState.PrevNormal;
             return TempoState.None;
         }
