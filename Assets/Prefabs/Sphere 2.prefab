@@ -104,7 +104,7 @@ SphereCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -151,9 +151,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _score: 100
   _damageAmount: 10
+  _speed: 0
   _effect: {fileID: 2433282508537954060, guid: 3ef3ae421f71c5c4e97fe12dc2fc6312, type: 3}
   _preparationBeat: 3
-  _radius: 1
+  _radius: 3
   _playerLayerMask:
     serializedVersion: 2
     m_Bits: 256
