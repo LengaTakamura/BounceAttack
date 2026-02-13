@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Player;
 using UnityEngine;
 using UnityEngine.Pool;
 using Random = UnityEngine.Random;
@@ -13,6 +14,12 @@ public class EnemySpawner : MonoBehaviour, IBeatSyncListener
     [SerializeField] private int _maxSize;
     private Action<BeatInfo> _onBeatAction;
     private BeatInfo _beatInfo;
+
+    private Action _OnFixedUpdateAction;
+
+    private Action _OnUpdateAction;
+
+    [SerializeField] private PlayerManager _player;
 
     private void Awake()
     {
@@ -41,6 +48,8 @@ public class EnemySpawner : MonoBehaviour, IBeatSyncListener
     private void ReleaseEnemy(EnemyBase enemyBase)
     {
         _onBeatAction -= enemyBase.EnemyOnBeat;
+        _OnFixedUpdateAction -= enemyBase.OnFixedUpdate;
+        _OnUpdateAction -= enemyBase.OnUpdate;
         enemyBase.gameObject.SetActive(false);
     }
 
@@ -52,6 +61,12 @@ public class EnemySpawner : MonoBehaviour, IBeatSyncListener
         enemyBase.transform.rotation = _spawnPoints[random].rotation;
         enemyBase.InitOnPool(() => _pool.Release(enemyBase));
         _onBeatAction += enemyBase.EnemyOnBeat;
+        _OnFixedUpdateAction += enemyBase.OnFixedUpdate;
+        _OnUpdateAction += enemyBase.OnUpdate;
+        if(enemyBase is ITracking tracking)
+        {
+            tracking.SetTargetPosition(() => _player.transform.position);
+        }
         enemyBase.Init(_beatInfo);
     }
 
@@ -67,11 +82,21 @@ public class EnemySpawner : MonoBehaviour, IBeatSyncListener
     {
         _beatInfo = beatInfo;
         _onBeatAction?.Invoke(_beatInfo);
-        if ((int)_beatInfo.BeatCount % 3 == 0)
+        if ((int)_beatInfo.CurrentBeat % 3 == 0)
         {
             //if(_beatInfo.CurrentBeat < 10) return;
             DebugWave();
         }
+    }
+
+    void FixedUpdate()
+    {
+        _OnFixedUpdateAction?.Invoke();
+    }
+
+    void Update()
+    {
+        _OnUpdateAction?.Invoke();
     }
 
     private void DebugWave()
@@ -82,11 +107,14 @@ public class EnemySpawner : MonoBehaviour, IBeatSyncListener
             _pool.Get();
         }
     }
-
-
     private void OnDestroy()
     {
         BeatSyncDispatcher.Instance.Unregister(this);
     }
+}
+
+public interface ITracking
+{
+    void SetTargetPosition(Func<Vector3> targetPositionProvider);
 }
     
