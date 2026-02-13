@@ -124,3 +124,4 @@ MonoBehaviour:
   _score: 10
   _damageAmount: 80
   _delay: 10
+  _moveSpeed: 10
