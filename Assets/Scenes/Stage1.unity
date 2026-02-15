@@ -2141,9 +2141,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _enemyList:
-  - {fileID: 4345328958501210818, guid: 2c62bfa740831204284ddee8f9878a89, type: 3}
   - {fileID: 803757340155504470, guid: 96d2359f16206524b8f4cda026b61fd7, type: 3}
-  - {fileID: 803757340155504470, guid: e3af95dda8d70484089545a2b2cefe4a, type: 3}
+  - {fileID: 4345328958501210818, guid: c4bd695657202b2488467f9c71591f30, type: 3}
   _spawnPoints:
   - {fileID: 1557476623}
   - {fileID: 142463421}
@@ -2554,6 +2553,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _soundManager: {fileID: 355822104}
   _defaultBpm: 60
+  _changeTempoBeat: 30
+  _prepareBeat: 5
+  _betweenBeats: 10
   _waitingTime: 5
 --- !u!4 &1997912421
 Transform:
