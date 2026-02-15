@@ -9,7 +9,7 @@ namespace UI
        [SerializeField] private List<UiBase> _uiObjects = new();
         private void Awake()
         {
-            BeatSyncDispatcher.Instance.Register(this);
+            BeatSyncDispatcher.Instance.RegisterBeatSync(this);
         }
 
         public void Init(Presenter presenter)
