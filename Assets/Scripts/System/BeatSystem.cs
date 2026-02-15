@@ -24,17 +24,12 @@ namespace System
         [SerializeField] private float _waitingTime = 5f;
 
         public int BetweenBeats { get { return _betweenBeats; } }
-
-        public Action OnBreak;
-
         private bool _once;
-
         private bool _isWaiting;
-
         public bool IsWaiting {  get { return _isWaiting; } }
         private void Awake()
         {
-            BeatSyncDispatcher.Instance.Register(this);
+            BeatSyncDispatcher.Instance.RegisterBeatSync(this);
             _betweenBeats = 4;
             _prepareBeat = 6;
             _isWaiting = true;
@@ -87,7 +82,7 @@ namespace System
 
         private void OnDisable()
         {
-            BeatSyncDispatcher.Instance.Unregister(this);
+            BeatSyncDispatcher.Instance.UnregisterBeatSync(this);
         }
 
         private TempoState ChangeTempo(int count)
@@ -98,7 +93,8 @@ namespace System
             {
                 if (!_once)
                 {
-                    OnBreak?.Invoke();
+                    BeatSyncDispatcher.Instance.NotifyBreak();
+                    Debug.Log("Break通知");
                     _once = true;
                     return TempoState.None;
                 }
@@ -109,6 +105,7 @@ namespace System
             if(count >= _prepareBeat) return TempoState.PrevNormal;
             return TempoState.None;
         }
+
     }
 
     public struct BeatInfo
@@ -130,5 +127,10 @@ namespace System
         PrevFast,
         Fast,
         None
+    }
+
+    public interface IBreakListener
+    {
+        void OnBreak();
     }
 }
