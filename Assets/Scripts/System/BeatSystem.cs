@@ -18,24 +18,20 @@ namespace System
 
         public TempoState CurrentTempo { get; private set; }
 
-        public int ChangeTempoBeat { get; private set; } = 40;
-        public int PrepareBeat { get; private set; } = 5;
-        public int BetweenBeats { get; private set; }
-        
+        [SerializeField]private int _changeTempoBeat = 40;
+        [SerializeField] private int _prepareBeat = 5;
+        [SerializeField]private int _betweenBeats = 4;
         [SerializeField] private float _waitingTime = 5f;
 
-        public Action OnBreak;
-
+        public int BetweenBeats { get { return _betweenBeats; } }
         private bool _once;
-
         private bool _isWaiting;
-
         public bool IsWaiting {  get { return _isWaiting; } }
         private void Awake()
         {
-            BeatSyncDispatcher.Instance.Register(this);
-            BetweenBeats = 4;
-            PrepareBeat = 6;
+            BeatSyncDispatcher.Instance.RegisterBeatSync(this);
+            _betweenBeats = 4;
+            _prepareBeat = 6;
             _isWaiting = true;
             _once = false;
             _count = -1;
@@ -86,28 +82,30 @@ namespace System
 
         private void OnDisable()
         {
-            BeatSyncDispatcher.Instance.Unregister(this);
+            BeatSyncDispatcher.Instance.UnregisterBeatSync(this);
         }
 
         private TempoState ChangeTempo(int count)
         {
-            if (count >= ChangeTempoBeat + BetweenBeats - 1) return TempoState.Fast; // １テンポ目をとりやすくすためにー１
-            if(count >= ChangeTempoBeat) return TempoState.PrevFast;
-            if (count >= ChangeTempoBeat - BetweenBeats)
+            if (count >= _changeTempoBeat + _betweenBeats - 1) return TempoState.Fast; // １テンポ目をとりやすくすためにー１
+            if(count >= _changeTempoBeat) return TempoState.PrevFast;
+            if (count >= _changeTempoBeat - _betweenBeats)
             {
                 if (!_once)
                 {
-                    OnBreak?.Invoke();
+                    BeatSyncDispatcher.Instance.NotifyBreak();
+                    Debug.Log("Break通知");
                     _once = true;
                     return TempoState.None;
                 }
                 return TempoState.None;
                 
             }
-            if (count >= PrepareBeat + BetweenBeats * 2 - 1 ) return TempoState.Normal; // 準備期間は長く １テンポ目をとりやすくすためにー１
-            if(count >= PrepareBeat) return TempoState.PrevNormal;
+            if (count >= _prepareBeat + _betweenBeats * 2 - 1 ) return TempoState.Normal; // 準備期間は長く １テンポ目をとりやすくすためにー１
+            if(count >= _prepareBeat) return TempoState.PrevNormal;
             return TempoState.None;
         }
+
     }
 
     public struct BeatInfo
@@ -129,5 +127,10 @@ namespace System
         PrevFast,
         Fast,
         None
+    }
+
+    public interface IBreakListener
+    {
+        void OnBreak();
     }
 }

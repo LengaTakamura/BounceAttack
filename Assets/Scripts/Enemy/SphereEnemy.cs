@@ -1,3 +1,4 @@
+
 using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
@@ -6,7 +7,7 @@ using NaughtyAttributes;
 using Player;
 using UnityEngine;
 
-public class SphereEnemy : EnemyBase
+public class SphereEnemy : EnemyBase, ITracking
 {
     private int _count;
 
@@ -19,6 +20,8 @@ public class SphereEnemy : EnemyBase
     [SerializeField, Label("爆撃の有効範囲")] private int _radius;
     
     [SerializeField] private LayerMask _playerLayerMask;
+
+    private Func<Vector3> _targetPosition;
     public override void Init(BeatInfo beatinfo)
     {
         base.Init(beatinfo);
@@ -31,7 +34,8 @@ public class SphereEnemy : EnemyBase
     {
         _cts = new CancellationTokenSource();
         await UniTask.Delay(TimeSpan.FromSeconds(time), cancellationToken: _cts.Token);
-        await transform.DOJump(new Vector3(0f, 0f, 0f), jumpPower: 3f, numJumps: 3, duration: preparationTime)
+        var targetPos = _targetPosition != null ? _targetPosition.Invoke() : transform.position;
+        await transform.DOJump(targetPos, jumpPower: 3f, numJumps: 3, duration: preparationTime)
             .ToUniTask(cancellationToken: _cts.Token);
         if (_effect)
         {
@@ -43,12 +47,12 @@ public class SphereEnemy : EnemyBase
 
     private void CheckPlayer()
     {
-        var array = new Collider[5];
+        var array = new Collider[50];
         var count = Physics.OverlapSphereNonAlloc(transform.position, _radius,array,_playerLayerMask);
         if(count == 0) return;
         for (int i = 0; i < count; i++)
         {
-            if(!array[i].gameObject.TryGetComponent(out PlayerManager player)) return;
+            if(!array[i].gameObject.TryGetComponent(out PlayerManager player)) continue;
             OnAttack(player);
         }
     }
@@ -58,5 +62,9 @@ public class SphereEnemy : EnemyBase
         _cts?.Cancel();
         _cts?.Dispose();
     }
-    
+
+    public void SetTargetPosition(Func<Vector3> targetPositionProvider)
+    {
+        _targetPosition = targetPositionProvider;
+    }
 }

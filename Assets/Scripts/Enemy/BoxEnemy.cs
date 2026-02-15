@@ -4,11 +4,10 @@ using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Player;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 namespace Enemy
 {
-    public class BoxEnemy : EnemyBase
+    public class BoxEnemy : EnemyBase, ITracking
     {
         private int _count;
         
@@ -17,19 +16,23 @@ namespace Enemy
         [SerializeField] private int _delay = 10;
         
         private CancellationTokenSource _cts;
+
+        private Func<Vector3> _setTargetPosition;
+
+        private Vector3 _targetPos;
+
+        [SerializeField] private float _moveSpeed = 5f;
+
         public override void Init(BeatInfo beatInfo)
         {
-            Move(beatInfo.SecondsPerBeat).Forget();
+            StartMoving(beatInfo.SecondsPerBeat).Forget();
             _count = -1;
         }
 
-        private async UniTaskVoid Move(float secondsPerBeat)
+        private async UniTaskVoid StartMoving(float secondsPerBeat)
         {
-            var randomX = Random.Range(0f, 10f);
-            var randomY = Random.Range(0f, 10f);
-            var randomZ = Random.Range(0f, 10f);
             _cts = new CancellationTokenSource();
-            await transform.DOLocalMove(new Vector3(randomX, randomY, randomZ), secondsPerBeat * _delay).SetEase(Ease.Linear).ToUniTask(cancellationToken: _cts.Token);
+            await UniTask.Delay(TimeSpan.FromSeconds(secondsPerBeat * _delay), cancellationToken: _cts.Token);
             Suicide();
         }
         public override void EnemyOnBeat(BeatInfo info)
@@ -45,6 +48,17 @@ namespace Enemy
             }
         }
 
+        public override void OnFixedUpdate()
+        {
+            base.OnFixedUpdate();
+            _targetPos = _setTargetPosition?.Invoke() ?? transform.position;
+            Move();
+        }
+
+        private void Move()
+        {
+            transform.position += Direction * _moveSpeed * Time.deltaTime;
+        }
         private void OnDisable()
         {
             _cts?.Cancel();
@@ -62,6 +76,11 @@ namespace Enemy
             if (!other.gameObject.TryGetComponent(out PlayerManager playerManager)) return;
             OnAttack(playerManager);
             Suicide();
+        }
+
+        public void SetTargetPosition(Func<Vector3> targetPositionProvider)
+        {
+            _setTargetPosition = targetPositionProvider;
         }
     }
 }

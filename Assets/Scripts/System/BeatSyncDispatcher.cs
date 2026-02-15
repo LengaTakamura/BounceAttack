@@ -11,6 +11,7 @@ namespace System
         public static BeatSyncDispatcher Instance;
 
         [SerializeField] private BeatSystem _beatSystem;
+        private readonly List<IBreakListener> _breakables = new();
 
         private void Awake()
         {
@@ -24,7 +25,7 @@ namespace System
             CriAtomExBeatSync.OnCallback += ListenersOnBeat;
         }
 
-        public void Register(IBeatSyncListener listener)
+        public void RegisterBeatSync(IBeatSyncListener listener)
         {
             if (!_listeners.Contains(listener))
             {
@@ -36,7 +37,21 @@ namespace System
             }
         }
 
-        public void Clear() => _listeners.Clear();
+        public void RegisterBreak(IBreakListener breakable)
+        {
+            if (!_breakables.Contains(breakable))
+            {
+                _breakables.Add(breakable);
+            }
+            else
+            {
+                Debug.LogWarning("breakable already registered");
+            }
+        }
+
+
+
+        public void ClearBeatSync() => _listeners.Clear();
 
         public T Get<T>() where T : class, IBeatSyncListener
         {
@@ -52,7 +67,7 @@ namespace System
             return null;
         }
 
-        public void Unregister(IBeatSyncListener listener)
+        public void UnregisterBeatSync(IBeatSyncListener listener, IBreakListener breakable = null)
         {
             if (_listeners.Contains(listener))
             {
@@ -64,15 +79,35 @@ namespace System
             }
         }
 
+        public void UnregisterBreak(IBreakListener breakable)
+        {
+            if (_breakables.Contains(breakable))
+            {
+                _breakables.Remove(breakable);
+            }
+            else
+            {
+                Debug.LogWarning("breakable not registered");
+            }
+        }
+
         private void ListenersOnBeat(ref CriAtomExBeatSync.Info info)
         {
             var beatInfo = _beatSystem.UpdateInfo(info); //情報の更新
-            if(_beatSystem.CurrentTempo == TempoState.Normal && beatInfo.CurrentBeat % 2 == 1) return;
-            if(_beatSystem.CurrentTempo == TempoState.PrevNormal && beatInfo.CurrentBeat % 2 == 1) return;
-            if(_beatSystem.CurrentTempo == TempoState.None) return;
+            if (_beatSystem.CurrentTempo == TempoState.Normal && beatInfo.CurrentBeat % 2 == 1) return;
+            if (_beatSystem.CurrentTempo == TempoState.PrevNormal && beatInfo.CurrentBeat % 2 == 1) return;
+            if (_beatSystem.CurrentTempo == TempoState.None) return;
             foreach (var listener in _listeners)
             {
-                listener.OnBeat(beatInfo);　// 更新された情報を各要素に注入
+                listener.OnBeat(beatInfo); // 更新された情報を各要素に注入
+            }
+        }
+
+        public void NotifyBreak()
+        {
+            foreach (var breakable in _breakables)
+            {
+                breakable.OnBreak();
             }
         }
     }

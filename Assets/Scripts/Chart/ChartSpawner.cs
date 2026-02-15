@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 namespace Chart
 {
-   public class ChartSpawner : MonoBehaviour,IBeatSyncListener
+   public class ChartSpawner : MonoBehaviour,IBeatSyncListener, IBreakListener
    {
       [SerializeField] private ChartController _chart;
       
@@ -25,7 +25,8 @@ namespace Chart
       private List<ChartController> _activeCharts = new List<ChartController>();
       private void Awake()
       {
-         BeatSyncDispatcher.Instance.Register(this);
+         BeatSyncDispatcher.Instance.RegisterBeatSync(this);
+         BeatSyncDispatcher.Instance.RegisterBreak(this);
       }
 
       private void Start()
@@ -47,7 +48,6 @@ namespace Chart
          _initialPosition = _chart.GetComponent<RectTransform>().anchoredPosition;
          _beatSystem = BeatSyncDispatcher.Instance.Get<BeatSystem>();
          _beatDelay = _beatSystem.BetweenBeats;
-         _beatSystem.OnBreak += HideChart;
       }
 
       private ChartController InstantiateChart()
@@ -98,7 +98,13 @@ namespace Chart
 
       private void OnDestroy()
       {
-         BeatSyncDispatcher.Instance.Unregister(this);
+         BeatSyncDispatcher.Instance.UnregisterBreak(this);
+         BeatSyncDispatcher.Instance.UnregisterBeatSync(this);
       }
-   }
+
+        public void OnBreak()
+        {
+            HideChart();
+        }
+    }
 }

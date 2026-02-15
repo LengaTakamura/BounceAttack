@@ -28,7 +28,7 @@ namespace System
 
         private void Start()
         {
-            BeatSyncDispatcher.Instance.Register(this);
+            BeatSyncDispatcher.Instance.RegisterBeatSync(this);
             _beatSystem = BeatSyncDispatcher.Instance.Get<BeatSystem>();
         }
 
@@ -128,7 +128,7 @@ namespace System
 
         private void OnDestroy()
         {
-            BeatSyncDispatcher.Instance.Unregister(this);
+            BeatSyncDispatcher.Instance.UnregisterBeatSync(this);
         }
     }
     

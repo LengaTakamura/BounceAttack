@@ -7,24 +7,25 @@ public class EnemyBase : MonoBehaviour
     [SerializeField] private int _score;
 
     private Action _onDeath;
-    
-    private float _timer;
 
     [SerializeField] private int _damageAmount;
-
-    [SerializeField] private float _speed;
-
     private bool _dead = true;
+
+    public Vector3 Direction { get; set; }
     void Awake()
     {
        
     }
     
-
-    private void Update()
+    public virtual void OnFixedUpdate()
     {
+        
     }
 
+    public virtual void OnUpdate()
+    {
+        
+    }
     public virtual void EnemyOnBeat(BeatInfo info)
     {
        
@@ -41,7 +42,7 @@ public class EnemyBase : MonoBehaviour
         _dead = false;
     }
     
-    protected void Suicide()
+    public void Suicide()
     {
         if (_dead) return;
         _dead = true;
@@ -65,11 +66,5 @@ public class EnemyBase : MonoBehaviour
     public int GetDamageAmount()
     {
         return _damageAmount;
-    }
-
-    public virtual void Move(Vector3 destination)
-    {
-        var vect = (destination - transform.position).normalized;
-        transform.Translate(vect * _speed);
     }
 }
