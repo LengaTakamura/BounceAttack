@@ -42,7 +42,7 @@ public class EnemyBase : MonoBehaviour
         _dead = false;
     }
     
-    protected void Suicide()
+    public void Suicide()
     {
         if (_dead) return;
         _dead = true;

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Pool;
 
-public class EnemyLineSpawner : MonoBehaviour, IBeatSyncListener
+public class EnemyLineSpawner : MonoBehaviour, IBeatSyncListener, IBreakListener
 {
     [SerializeField] private Renderer _groundPrefab;
     [SerializeField] private int _lineCount;
@@ -15,12 +15,14 @@ public class EnemyLineSpawner : MonoBehaviour, IBeatSyncListener
     [SerializeField] private List<EnemyBase> _enemyList;
     [SerializeField] private List<SpawnPattern> _spawnPatternes;
     [SerializeField] private int _spawnInterval;
+    private List<EnemyBase> _activeEnemies = new List<EnemyBase>();
     private Action _OnFixedUpdateAction;
     private int _count;
 
     private void Start()
     {
-        BeatSyncDispatcher.Instance.Register(this);
+        BeatSyncDispatcher.Instance.RegisterBeatSync(this);
+        BeatSyncDispatcher.Instance.RegisterBreak(this);
         Init();
         _count = 0;
     }
@@ -48,6 +50,7 @@ public class EnemyLineSpawner : MonoBehaviour, IBeatSyncListener
         _onBeatAction -= enemyBase.EnemyOnBeat;
         _OnFixedUpdateAction -= enemyBase.OnFixedUpdate;
         enemyBase.gameObject.SetActive(false);
+        _activeEnemies.Remove(enemyBase);
     }
 
     private void GetEnemy(EnemyBase enemyBase)
@@ -56,6 +59,7 @@ public class EnemyLineSpawner : MonoBehaviour, IBeatSyncListener
         enemyBase.InitOnPool(() => _pool.Release(enemyBase));
         _onBeatAction += enemyBase.EnemyOnBeat;
         _OnFixedUpdateAction += enemyBase.OnFixedUpdate;
+        _activeEnemies.Add(enemyBase);
         enemyBase.Init(_beatInfo);
     }
 
@@ -124,7 +128,8 @@ public class EnemyLineSpawner : MonoBehaviour, IBeatSyncListener
     }
     private void OnDestroy()
     {
-        BeatSyncDispatcher.Instance.Unregister(this);
+        BeatSyncDispatcher.Instance.UnregisterBeatSync(this);
+        BeatSyncDispatcher.Instance.UnregisterBreak(this);
     }
 
     private void LeftSideSpawn()
@@ -176,6 +181,14 @@ public class EnemyLineSpawner : MonoBehaviour, IBeatSyncListener
             var enemy = _pool.Get();
             enemy.transform.position = new Vector3(_groundPrefab.bounds.min.x + interval * i, 3, minZ);
             enemy.Direction = Vector3.forward;
+        }
+    }
+
+    public void OnBreak()
+    {
+        foreach (var enemy in _activeEnemies.ToArray())
+        {
+            enemy.Suicide();
         }
     }
 }
