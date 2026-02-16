@@ -8,32 +8,34 @@ namespace Chart
 {
    public class ChartSpawner : MonoBehaviour,IBeatSyncListener, IBreakListener
    {
-      [SerializeField] private ChartController _chart;
+      private ChartController _chart;
       
       [SerializeField] private Canvas _canvas;
 
-      [SerializeField] private Image _targetImage;
+      private Image _targetImage;
       
       private ObjectPool<ChartController> _chartImagePool;
 
-      [SerializeField] private int _defaultSize;
-      [SerializeField] private int _maxSize;
+      private int _defaultSize;
+      private int _maxSize;
       private Vector2 _initialPosition;
       private BeatInfo _beatInfo;
-      private BeatSystem _beatSystem;
-      [SerializeField] private int _beatDelay = 4;
+      private InGameBeatSystem _beatSystem;
+      private int _beatDelay = 4;
       private List<ChartController> _activeCharts = new List<ChartController>();
-      private void Awake()
+      public void InGameInit(ChartSpawnerData data)
       {
+         _chart = data.ChartPrefab;
+         _defaultSize = data.DefaultSize;
+         _maxSize = data.MaxSize;
+         _beatDelay = data.BeatDelay;
+         _targetImage = data.TargetImage;
+
          BeatSyncDispatcher.Instance.RegisterBeatSync(this);
          BeatSyncDispatcher.Instance.RegisterBreak(this);
-      }
 
-      private void Start()
-      {
          Init();
       }
-
       private void Init()
       {
          _chartImagePool = new ObjectPool<ChartController>(
@@ -46,7 +48,7 @@ namespace Chart
             maxSize: _maxSize
          );
          _initialPosition = _chart.GetComponent<RectTransform>().anchoredPosition;
-         _beatSystem = BeatSyncDispatcher.Instance.Get<BeatSystem>();
+         _beatSystem = BeatSyncDispatcher.Instance.Get<InGameBeatSystem>();
          _beatDelay = _beatSystem.BetweenBeats;
       }
 

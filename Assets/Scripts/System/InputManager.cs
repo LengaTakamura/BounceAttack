@@ -4,14 +4,17 @@ using UnityEngine;
 
 namespace System
 {
-    public class InputManager : MonoBehaviour, IBeatSyncListener
+    public class InputManager : IBeatSyncListener,IDisposable
     {
         BeatInfo _info;
         public InputType CurrentInputType { get; private set; }
-        [SerializeField] private SerializableDictionary<InputType, int> _baseScores = new();
-        private BeatSystem _beatSystem;
+
+        InputManagerData _data;
+        private InGameBeatSystem _beatSystem;
         
         #region イベント
+
+        private readonly CompositeDisposable _disposables = new();
         private readonly ReactiveProperty<int> _currentScore = new(0);
         public ReadOnlyReactiveProperty<int> CurrentScore => _currentScore;
         
@@ -26,13 +29,19 @@ namespace System
         public Observable<Unit> OnAttack => _onAttack;
         #endregion 
 
-        private void Start()
+        public InputManager(InGameBeatSystem beatSystem)
         {
+            _beatSystem = beatSystem;
             BeatSyncDispatcher.Instance.RegisterBeatSync(this);
-            _beatSystem = BeatSyncDispatcher.Instance.Get<BeatSystem>();
         }
 
-        private void Update()
+        public void InGameInit(InputManagerData data)
+        {
+            CurrentInputType = InputType.None;
+            _data = data;
+        }
+
+        public void OnUpdate()
         {
             CurrentInputType = GetInputType();
             if(_beatSystem.IsWaiting) return;
@@ -95,15 +104,15 @@ namespace System
                 }
                 case BeatActionType.Bad:
                 {
-                    return _baseScores[inputType] * 0.5f;
+                    return _data.BaseScores[inputType] * _data.BadMultiplier;
                 }
                 case BeatActionType.Good:
                 {
-                    return _baseScores[inputType];
+                    return _data.BaseScores[inputType] * _data.GoodMultiplier;
                 }
                 case BeatActionType.Great:
                 {
-                    return _baseScores[inputType] * 1.5f;
+                    return _data.BaseScores[inputType] * _data.GreatMultiplier;
                 }
             }
 
@@ -124,11 +133,16 @@ namespace System
         {
             _info = beatInfo;
         }
-
-
-        private void OnDestroy()
+        public void Dispose()
         {
             BeatSyncDispatcher.Instance.UnregisterBeatSync(this);
+
+            _disposables?.Dispose();
+
+            _currentScore?.Dispose();
+            _scoreChanged?.Dispose();
+            _onInputAction?.Dispose();
+            _onAttack?.Dispose();
         }
     }
     

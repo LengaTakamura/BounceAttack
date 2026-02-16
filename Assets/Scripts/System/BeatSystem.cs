@@ -4,44 +4,44 @@ using UnityEngine;
 
 namespace System
 {
-    public class BeatSystem : MonoBehaviour, IBeatSyncListener
+    public class InGameBeatSystem : IBeatSyncListener,IDisposable
     {
-        [SerializeField] private SoundManager _soundManager;
+        private SoundManager _soundManager;
 
         private CriAtomExPlayback _playback;
 
         private int _count;
-
-        public float DefaultSecondsPerBeat => 60f / _defaultBpm;
-
-        [SerializeField] private int _defaultBpm = 60;
-
         public TempoState CurrentTempo { get; private set; }
 
-        [SerializeField]private int _changeTempoBeat = 40;
-        [SerializeField] private int _prepareBeat = 5;
-        [SerializeField]private int _betweenBeats = 4;
-        [SerializeField] private float _waitingTime = 5f;
+        private int _changeTempoBeat;
+        private int _prepareBeat;
+        private int _betweenBeats;
+        private float _waitingTime;
 
         public int BetweenBeats { get { return _betweenBeats; } }
         private bool _once;
         private bool _isWaiting;
-        public bool IsWaiting {  get { return _isWaiting; } }
-        private void Awake()
+        public bool IsWaiting { get { return _isWaiting; } }
+
+
+        public InGameBeatSystem(SoundManager soundManager)
         {
-            BeatSyncDispatcher.Instance.RegisterBeatSync(this);
-            _betweenBeats = 4;
-            _prepareBeat = 6;
+            _soundManager = soundManager;
+        }
+        public void InGameInit(BeatSystemData beatSystemData)
+        {
+            _betweenBeats = beatSystemData.BetweenBeats;
+            _prepareBeat = beatSystemData.prepareBeat;
+            _changeTempoBeat = beatSystemData.ChangeTempoBeat;
+            _waitingTime = beatSystemData.WaitingTime;
+
             _isWaiting = true;
             _once = false;
             _count = -1;
-        }
 
-        private void Start()
-        {
+            BeatSyncDispatcher.Instance.RegisterBeatSync(this);
             Init().Forget();
         }
-
         private async UniTaskVoid Init()
         {
             CurrentTempo = TempoState.None;
@@ -79,16 +79,10 @@ namespace System
 
             return copy;
         }
-
-        private void OnDisable()
-        {
-            BeatSyncDispatcher.Instance.UnregisterBeatSync(this);
-        }
-
         private TempoState ChangeTempo(int count)
         {
             if (count >= _changeTempoBeat + _betweenBeats - 1) return TempoState.Fast; // １テンポ目をとりやすくすためにー１
-            if(count >= _changeTempoBeat) return TempoState.PrevFast;
+            if (count >= _changeTempoBeat) return TempoState.PrevFast;
             if (count >= _changeTempoBeat - _betweenBeats)
             {
                 if (!_once)
@@ -99,13 +93,17 @@ namespace System
                     return TempoState.None;
                 }
                 return TempoState.None;
-                
+
             }
-            if (count >= _prepareBeat + _betweenBeats * 2 - 1 ) return TempoState.Normal; // 準備期間は長く １テンポ目をとりやすくすためにー１
-            if(count >= _prepareBeat) return TempoState.PrevNormal;
+            if (count >= _prepareBeat + _betweenBeats * 2 - 1) return TempoState.Normal; // 準備期間は長く １テンポ目をとりやすくすためにー１
+            if (count >= _prepareBeat) return TempoState.PrevNormal;
             return TempoState.None;
         }
 
+        public void Dispose()
+        {
+            BeatSyncDispatcher.Instance.UnregisterBeatSync(this);
+        }
     }
 
     public struct BeatInfo

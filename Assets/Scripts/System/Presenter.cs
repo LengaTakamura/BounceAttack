@@ -1,15 +1,14 @@
 using Player;
 using R3;
 using UI;
-using UnityEngine;
 
 namespace System
 {
-    public class Presenter : MonoBehaviour
+    public class Presenter : IDisposable
     {
-        [SerializeField] private InputManager _inputManager;
-        [SerializeField] private UiManager _uiManager;
-        [SerializeField] private PlayerManager _playerManager;
+        private InputManager _inputManager;
+        private UiManager _uiManager;
+        private PlayerManager _playerManager;
         
         public int Health => _playerManager.CurrentHealth;
         
@@ -24,17 +23,26 @@ namespace System
         public Observable<Unit> OnAttack => _inputManager.OnAttack;
         
         public Observable<int> OnHit => _playerManager.OnHit;
-        
-        private void Start()
+
+        public Presenter(PlayerManager playerManager, UiManager uiManager, InputManager inputManager)
         {
-            _uiManager.Init(this);
-            OnAttack.Subscribe(_ => _playerManager.AttackEnemies()).AddTo(this);
+            _playerManager = playerManager;
+            _uiManager = uiManager;
+            _inputManager = inputManager;
         }
 
-
-        private void OnDestroy()
+        
+        public void InGameInit(UiView uiView)
         {
-            _disposables.Dispose();
+            _uiManager.InGameInitByPresenter(this ,uiView);
+            //InputManagerの初期化はInGameManagerで行う
+            //PresenterはInputManagerを参照するため、InputManagerの初期化後にPresenterの初期化を行う必要がある
+            OnAttack.Subscribe(_ => _playerManager.AttackEnemies()).AddTo(_disposables);
+        }
+
+        public void Dispose()
+        {
+            _disposables?.Dispose();
         }
     }
 }

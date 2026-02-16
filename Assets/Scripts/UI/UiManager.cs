@@ -1,23 +1,22 @@
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace UI
 {
-    public class UiManager : MonoBehaviour,IBeatSyncListener
+    public class UiManager : IBeatSyncListener,IDisposable
     {
-       [SerializeField] private List<UiBase> _uiObjects = new();
-        private void Awake()
+        private List<UiBase> _uiObjects = new();
+
+        public void InGameInitByPresenter(Presenter presenter, UiView uiView)
         {
             BeatSyncDispatcher.Instance.RegisterBeatSync(this);
-        }
 
-        public void Init(Presenter presenter)
-        {
-            foreach (var uiObject in _uiObjects)
+            _uiObjects = uiView.UiObjects;
+            foreach (var ui in _uiObjects)
             {
-                uiObject.Init(presenter);
+                ui.Init(presenter);
             }
+
         }
 
         public void OnBeat(BeatInfo info)
@@ -27,11 +26,17 @@ namespace UI
                 uiObject.UIOnBeat(info);
             }
         }
-        
+
+        public void Dispose()
+        {
+            BeatSyncDispatcher.Instance.UnregisterBeatSync(this);
+            _uiObjects?.Clear();
+        }
+
     }
 
     public enum UiType
     {
-        Score,InputAction,Player,Time,Enemy,None
+        Score, InputAction, Player, Time, Enemy, None
     }
 }
