@@ -1,13 +1,26 @@
+using System;
 using CriWare;
-using UnityEngine;
 
-public class SoundManager : MonoBehaviour
+public class SoundManager : IDisposable
 {
-    [SerializeField]private CriAtomSource _source;
-    [SerializeField] private string _bgmCueName;
+    private CriAtomSource _source;
+    private string _bgmCueName;
+    public void InGameInit(CriAtomSource source, SoundData soundData)
+    {
+        _source = source;
+        _bgmCueName = soundData.CueName;
+        _source.cueSheet = soundData.CueSheet;
+    }
     public CriAtomExPlayback PlayBgm()
     {
         var playback = _source.Play(_bgmCueName);
         return playback;
+    }
+
+    public void Dispose()
+    {
+        _source?.Stop();
+        _source = null;
+        _bgmCueName = null;
     }
 }

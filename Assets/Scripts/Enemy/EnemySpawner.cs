@@ -7,11 +7,17 @@ using Random = UnityEngine.Random;
 
 public class EnemySpawner : MonoBehaviour, IBeatSyncListener,IBreakListener
 {
-    [SerializeField] private List<GameObject> _enemyList;
+    //todo: 敵のスポーン位置を属性で指定できるようにしたり、生成・破壊時の処理を別に移すことでMonobehaviourから切り離すことができるかもしれないが、
+    // 現状はシンプルにするためにMonobehaviourのままにしている
+
     [SerializeField] private List<Transform> _spawnPoints;
+    private List<GameObject> _enemyList;
     private ObjectPool<EnemyBase> _pool;
-    [SerializeField] private int _defaultSize;
-    [SerializeField] private int _maxSize;
+    private int _defaultSize;
+    private int _maxSize;
+    private int _spawnInterval;
+    private int _minSpawnCount;
+    private int _maxSpawnCount;
     private Action<BeatInfo> _onBeatAction;
     private BeatInfo _beatInfo;
     private Action _OnFixedUpdateAction;
@@ -19,10 +25,18 @@ public class EnemySpawner : MonoBehaviour, IBeatSyncListener,IBreakListener
     private List<EnemyBase> _activeEnemies = new List<EnemyBase>();
     [SerializeField] private PlayerManager _player;
 
-    private void Awake()
+    public void InGameInit(EnemySpawnerData data)
     {
+        _enemyList = data.EnemyPrefabs;
+        _defaultSize = data.DefaultSize;
+        _maxSize = data.MaxSize;
+        _spawnInterval = data.SpawnInterval;
+        _minSpawnCount = data.MinSpawnCount;
+        _maxSpawnCount = data.MaxSpawnCount;
+
         BeatSyncDispatcher.Instance.RegisterBeatSync(this);
         BeatSyncDispatcher.Instance.RegisterBreak(this);
+        
         Init();
     }
 
@@ -83,10 +97,9 @@ public class EnemySpawner : MonoBehaviour, IBeatSyncListener,IBreakListener
     {
         _beatInfo = beatInfo;
         _onBeatAction?.Invoke(_beatInfo);
-        if ((int)_beatInfo.CurrentBeat % 3 == 0)
+        if ((int)_beatInfo.CurrentBeat % _spawnInterval == 0)
         {
-            //if(_beatInfo.CurrentBeat < 10) return;
-            DebugWave();
+            Wave();
         }
     }
 
@@ -100,9 +113,9 @@ public class EnemySpawner : MonoBehaviour, IBeatSyncListener,IBreakListener
         _OnUpdateAction?.Invoke();
     }
 
-    private void DebugWave()
+    private void Wave()
     {
-        var random = Random.Range(0, 10);
+        var random = Random.Range(_minSpawnCount, _maxSpawnCount + 1);
         for (int i = 0; i < random; i++)
         {
             _pool.Get();

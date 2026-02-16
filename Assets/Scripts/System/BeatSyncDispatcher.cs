@@ -10,8 +10,9 @@ namespace System
 
         public static BeatSyncDispatcher Instance;
 
-        [SerializeField] private BeatSystem _beatSystem;
+        private InGameBeatSystem _beatSystem;
         private readonly List<IBreakListener> _breakables = new();
+        private bool _isInGame;
 
         private void Awake()
         {
@@ -22,9 +23,19 @@ namespace System
             }
             Instance = this;
             DontDestroyOnLoad(gameObject);
-            CriAtomExBeatSync.OnCallback += ListenersOnBeat;
         }
 
+        public void InGameInit(InGameBeatSystem beatSystem)
+        {
+            _beatSystem = beatSystem;
+            Init();
+            _isInGame = true;
+        }
+        public void Init()
+        {
+            CriAtomExBeatSync.OnCallback += ListenersOnBeat;
+            _isInGame = false;
+        }
         public void RegisterBeatSync(IBeatSyncListener listener)
         {
             if (!_listeners.Contains(listener))
@@ -93,13 +104,22 @@ namespace System
 
         private void ListenersOnBeat(ref CriAtomExBeatSync.Info info)
         {
-            var beatInfo = _beatSystem.UpdateInfo(info); //情報の更新
-            if (_beatSystem.CurrentTempo == TempoState.Normal && beatInfo.CurrentBeat % 2 == 1) return;
-            if (_beatSystem.CurrentTempo == TempoState.PrevNormal && beatInfo.CurrentBeat % 2 == 1) return;
-            if (_beatSystem.CurrentTempo == TempoState.None) return;
-            foreach (var listener in _listeners)
+            if (_isInGame)
             {
-                listener.OnBeat(beatInfo); // 更新された情報を各要素に注入
+                var beatInfo = _beatSystem.UpdateInfo(info); //情報の更新
+                if (_beatSystem.CurrentTempo == TempoState.Normal && beatInfo.CurrentBeat % 2 == 1) return;
+                if (_beatSystem.CurrentTempo == TempoState.PrevNormal && beatInfo.CurrentBeat % 2 == 1) return;
+                if (_beatSystem.CurrentTempo == TempoState.None) return;
+                foreach (var listener in _listeners)
+                {
+                    listener.OnBeat(beatInfo); // 更新された情報を各要素に注入
+                }
+            }
+            else
+            {
+                // アウトゲーム版BeatSystemはまだないので、BeatSyncDispatcherを経由してBeatInfoを渡すことができない。
+                // アウトゲーム版BeatSystemができたら、同様にBeatInfoを更新してから各要素に注入する形にする予定。
+                 Debug.LogWarning("アウトゲーム版BeatSystemはまだ実装されていません");
             }
         }
 

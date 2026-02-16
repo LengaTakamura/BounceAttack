@@ -5,26 +5,37 @@ using UnityEngine.Pool;
 
 public class EnemyLineSpawner : MonoBehaviour, IBeatSyncListener, IBreakListener
 {
-    [SerializeField] private Renderer _groundPrefab;
-    [SerializeField] private int _lineCount;
+    //todo: 生成、破壊処理を外部に移す事でMonobehaviourから切り離すことができるかもしれないが、
+    // Groundのサイズ等のSpawnerに依存する要素もあるため、現状はMonobehaviourのままにしている
+    [SerializeField]private Renderer _groundPrefab;
+    private int _lineCount;
     private ObjectPool<EnemyBase> _pool;
-    [SerializeField] private int _defaultSize;
-    [SerializeField] private int _maxSize;
+    private int _defaultSize;
+    private int _maxSize;
     private BeatInfo _beatInfo;
     private Action<BeatInfo> _onBeatAction;
-    [SerializeField] private List<EnemyBase> _enemyList;
-    [SerializeField] private List<SpawnPattern> _spawnPatternes;
-    [SerializeField] private int _spawnInterval;
+    private List<EnemyBase> _enemyList;
+    private List<SpawnPattern> _spawnPatternes;
+    private int _spawnInterval;
     private List<EnemyBase> _activeEnemies = new List<EnemyBase>();
     private Action _OnFixedUpdateAction;
     private int _count;
 
-    private void Start()
+    public void InGameInit(EnemyLineSpawnerData data)
     {
+        _lineCount = data.LineCount;
+        _defaultSize = data.DefaultSize;
+        _maxSize = data.MaxSize;
+        _enemyList = data.EnemyList;
+        _spawnPatternes = data.SpawnPatterns;
+        _spawnInterval = data.SpawnInterval;
+
+        _count = 0;
+        Init();
+
         BeatSyncDispatcher.Instance.RegisterBeatSync(this);
         BeatSyncDispatcher.Instance.RegisterBreak(this);
-        Init();
-        _count = 0;
+
     }
 
     private void Init()

@@ -19,7 +19,7 @@ namespace Player
         public Observable<int> OnHit => _onHit;
 
         private PlayerMove _move;
-        private void Awake()
+        public void InGameInit()
         {
             _currentHealth = _maxHealth;
             _move = GetComponent<PlayerMove>();
