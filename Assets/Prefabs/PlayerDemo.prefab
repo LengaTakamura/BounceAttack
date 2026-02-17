@@ -176,7 +176,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e044198ccdde3da44b9d8dddbc49777f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _maxHealth: 100
+  _maxHealth: 1000
   _attackRadius: 5
   _enemyLayerMask:
     serializedVersion: 2

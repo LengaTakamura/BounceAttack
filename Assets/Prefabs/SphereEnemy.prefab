@@ -150,8 +150,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _score: 100
-  _damageAmount: 10
-  _speed: 0
+  _damageAmount: 50
   _effect: {fileID: 2433282508537954060, guid: 3ef3ae421f71c5c4e97fe12dc2fc6312, type: 3}
   _preparationBeat: 3
   _radius: 1
