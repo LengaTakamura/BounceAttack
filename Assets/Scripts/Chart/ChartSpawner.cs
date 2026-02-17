@@ -23,12 +23,13 @@ namespace Chart
       private InGameBeatSystem _beatSystem;
       private int _beatDelay = 4;
       private List<ChartController> _activeCharts = new List<ChartController>();
-      public void InGameInit(ChartSpawnerData data, Canvas canvas,Image targetImage)
+      public void InGameInit(InGameBeatSystem beatSystem,ChartSpawnerData data, Canvas canvas,Image targetImage)
       {
          _chart = data.ChartPrefab;
          _defaultSize = data.DefaultSize;
          _maxSize = data.MaxSize;
-         _beatDelay = data.BeatDelay;
+
+         _beatSystem = beatSystem;
          
          _targetImage = targetImage;
          _canvas = canvas;
@@ -50,7 +51,6 @@ namespace Chart
             maxSize: _maxSize
          );
          _initialPosition = _chart.GetComponent<RectTransform>().anchoredPosition;
-         _beatSystem = BeatSyncDispatcher.Instance.Get<InGameBeatSystem>();
          _beatDelay = _beatSystem.BetweenBeats;
       }
 

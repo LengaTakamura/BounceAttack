@@ -66,7 +66,7 @@ namespace System
             _lineSpawner.InGameInit(_enemyLineSpawnerData);
             _inputManager.InGameInit(_inputManagerData);
             _presenter.InGameInit(_uiView);
-            _chartSpawner.InGameInit(_chartSpawnerData, _uiView.Canvas, _uiView.TargetImage);
+            _chartSpawner.InGameInit(_beatSystem,_chartSpawnerData, _uiView.Canvas, _uiView.TargetImage);
             _playerManager.InGameInit(_inputManager);
             _enemySpawner.InGameInit(_playerManager, _enemySpawnerData);
         }

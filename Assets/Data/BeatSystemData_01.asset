@@ -13,7 +13,6 @@ MonoBehaviour:
   m_Name: BeatSystemData_01
   m_EditorClassIdentifier: 
   prepareBeat: 5
-  BetweenBeats: 5
+  BetweenBeats: 4
   WaitingTime: 3
   ChangeTempoBeat: 120
-  DefaultBpm: 60
