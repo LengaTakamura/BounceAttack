@@ -12,5 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d4300d6025dab94dbb3a0076f64776d, type: 3}
   m_Name: SoundData_01
   m_EditorClassIdentifier: 
-  CueSheet: CueSheet_0
+  CueSheet:
+    name: CueSheet_0
+    acbFile: CueSheet_0.acb
+    awbFile: 
+    loaderStatus: 0
   CueName: maou_bgm_neorock41
