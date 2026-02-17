@@ -3,6 +3,7 @@ using CriWare;
 using Cysharp.Threading.Tasks;
 using Player;
 using UI;
+using Unity.Cinemachine;
 using UnityEngine;
 
 namespace System
@@ -33,6 +34,7 @@ namespace System
         [SerializeField] private ChartSpawnerData _chartSpawnerData;
         [SerializeField] private CriAtomSource _criAtomSource;
         [SerializeField] private Transform _playerSpawnPoint;
+        [SerializeField] private CinemachineCamera _cinemachineCamera;
 
         private void OnEnable()
         {
@@ -51,6 +53,7 @@ namespace System
             var player = Instantiate(_playerPrefab, _playerSpawnPoint.position, Quaternion.identity);
             _move = player.GetComponent<PlayerMove>();
             _playerManager = player.GetComponent<PlayerManager>();
+            _cinemachineCamera.Target.TrackingTarget = player.transform;
             _presenter = new Presenter(_playerManager, _uiManager, _inputManager);
             var ui = Instantiate(_inGameUiPrefab);
             _uiView = ui.GetComponent<UiView>();
@@ -65,9 +68,9 @@ namespace System
             _beatSystem.InGameInit(_beatSystemData);
             _lineSpawner.InGameInit(_enemyLineSpawnerData);
             _inputManager.InGameInit(_inputManagerData);
+            _playerManager.InGameInit(_inputManager);
             _presenter.InGameInit(_uiView);
             _chartSpawner.InGameInit(_beatSystem,_chartSpawnerData, _uiView.Canvas, _uiView.TargetImage);
-            _playerManager.InGameInit(_inputManager);
             _enemySpawner.InGameInit(_playerManager, _enemySpawnerData);
         }
 
