@@ -18,26 +18,27 @@ public class PlayerMove : MonoBehaviour
     [SerializeField] private float _blinkCoolTime;
     [SerializeField] private float _blinkTime;
     private CancellationTokenSource _cts;
-    [SerializeField] private InputManager _inputManager;
+    private InputManager _inputManager;
 
     private bool _isBlinking;
 
     public bool IsBlinking { get { return _isBlinking;} }
-    private void Start()
+    public void Init(InputManager inputManager)
     {
         _rigidbody = GetComponent<Rigidbody>();
         _canBlink = true;
         _cts = new CancellationTokenSource();
+        _inputManager = inputManager;
     }
 
-    private void Update()
+    public void OnUpdate()
     {
         IsGround();
         Jump();
         Blink();
     }
 
-    private void FixedUpdate()
+    public void OnFixedUpdate()
     {
         Run();
     }
@@ -93,7 +94,7 @@ public class PlayerMove : MonoBehaviour
         _isBlinking = true;
         try
         {
-            while (t < 0.8f) // 1.0‚¾‚ÆÅŒãŒ¸‘¬‚·‚é‚Ì‚Å‘¬“x‚ð‚È‚é‚×‚­•Û‚Á‚½‚Ü‚ÜI—¹‚·‚é‚±‚Æ‚ÅƒLƒŒ‚Ì‚ ‚é“®‚«‚É
+            while (t < 0.8f) // 1.0ï¿½ï¿½ï¿½ÆÅŒãŒ¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ì‚Å‘ï¿½ï¿½xï¿½ï¿½ï¿½È‚ï¿½×‚ï¿½ï¿½Û‚ï¿½ï¿½ï¿½ï¿½Ü‚ÜIï¿½ï¿½ï¿½ï¿½ï¿½é‚±ï¿½Æ‚ÅƒLï¿½ï¿½ï¿½Ì‚ï¿½ï¿½é“®ï¿½ï¿½ï¿½ï¿½
             {
                 currentTime += Time.deltaTime;
                 t = Mathf.Clamp01(currentTime / _blinkTime);
@@ -103,7 +104,7 @@ public class PlayerMove : MonoBehaviour
         }
         finally
         {
-            // finally‚É“ü‚ê‚é‚±‚Æ‚ÅAƒLƒƒƒ“ƒZƒ‹Žž‚àŠmŽÀ‚Éƒtƒ‰ƒO‚ª–ß‚é
+            // finallyï¿½É“ï¿½ï¿½ï¿½é‚±ï¿½Æ‚ÅAï¿½Lï¿½ï¿½ï¿½ï¿½ï¿½Zï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½mï¿½ï¿½ï¿½Éƒtï¿½ï¿½ï¿½Oï¿½ï¿½ï¿½ß‚ï¿½
             _isBlinking = false;
         }
         _canBlink = true;

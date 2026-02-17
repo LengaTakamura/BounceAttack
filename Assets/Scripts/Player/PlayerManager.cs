@@ -1,3 +1,4 @@
+using System;
 using R3;
 using UnityEngine;
 
@@ -19,10 +20,11 @@ namespace Player
         public Observable<int> OnHit => _onHit;
 
         private PlayerMove _move;
-        public void InGameInit()
+        public void InGameInit(InputManager inputManager)
         {
             _currentHealth = _maxHealth;
             _move = GetComponent<PlayerMove>();
+            _move.Init(inputManager);
         }
 
         public void TakeDamage(int damage)
