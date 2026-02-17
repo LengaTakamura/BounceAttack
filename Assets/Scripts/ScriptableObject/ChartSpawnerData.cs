@@ -9,9 +9,6 @@ namespace Chart
         [Header("Note Settings")]
         [Tooltip("ノーツのプレハブ")]
         public ChartController ChartPrefab;
-
-        [Tooltip("目標地点のイメージ")]
-        public Image TargetImage;
         
         [Tooltip("ターゲットに到達するまでの猶予拍数")]
         public int BeatDelay = 4;
