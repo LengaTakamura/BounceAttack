@@ -1,18 +1,18 @@
+using System;
 using R3;
 
 namespace Novel
 {
-    public sealed class NovelUiManager
+    public sealed class NovelUiManager:IDisposable
     {
         private NovelView _view;
-
         private TalkText _talk;
-
         private string[] _texts;
-
         private int _skipCount;
+        public Action OnSceneChanged;
+        private readonly CompositeDisposable _disposables = new();
 
-        // –{—ˆ‚Å‚ ‚ê‚ÎScriptableObject
+        // ï¿½{ï¿½ï¿½ï¿½Å‚ï¿½ï¿½ï¿½ï¿½ScriptableObject
         public NovelUiManager(NovelView view)
         {
             _view = view;
@@ -23,7 +23,7 @@ namespace Novel
 
         public void InitByPresenter(NovelPresenter presenter)
         {
-            presenter.OnClicked.Subscribe(_ => OnClicked());
+            presenter.OnClicked?.Subscribe(_ => OnClicked()).AddTo(_disposables);
             Init();
         }
 
@@ -40,9 +40,19 @@ namespace Novel
 
         private void OnClicked()
         {
-            if (_skipCount == _texts.Length - 1) return;
+            if (_skipCount == _texts.Length - 1)
+            {
+                OnSceneChanged?.Invoke();
+                return;
+            }
             _skipCount++;
             _talk.StartTextAnim(_texts[_skipCount]);
+        }
+
+        public void Dispose()
+        {
+            OnSceneChanged = null ;
+            _disposables?.Dispose();
         }
     }
 

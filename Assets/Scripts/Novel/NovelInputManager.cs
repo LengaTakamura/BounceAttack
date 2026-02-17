@@ -1,14 +1,13 @@
+using System;
 using R3;
 using UnityEngine;
 
 namespace Novel
 {
-    public sealed class NovelInputManager
+    public sealed class NovelInputManager:IDisposable
     {
         private readonly Subject<Unit> _onClicked = new();
         public Observable<Unit> OnClicked => _onClicked;
-
-        private readonly CompositeDisposable _disposables = new();
         public NovelInputManager()
         {
         }
@@ -17,15 +16,12 @@ namespace Novel
         {
             if (Input.GetMouseButtonDown(0))
             {
-                _onClicked.OnNext(Unit.Default);
+                _onClicked?.OnNext(Unit.Default);
             }
         }
-
-        public void OnEnd()
+        public void Dispose()
         {
-            _disposables.Dispose();
+           _onClicked?.Dispose();
         }
-
-        
     }
 }
