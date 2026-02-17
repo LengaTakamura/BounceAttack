@@ -6,14 +6,14 @@ using UnityEngine.UI;
 
 namespace Chart
 {
-   public class ChartSpawner : MonoBehaviour,IBeatSyncListener, IBreakListener
+   public class ChartSpawner : MonoBehaviour, IBeatSyncListener, IBreakListener
    {
       private ChartController _chart;
-      
-      [SerializeField] private Canvas _canvas;
+
+      private Canvas _canvas;
 
       private Image _targetImage;
-      
+
       private ObjectPool<ChartController> _chartImagePool;
 
       private int _defaultSize;
@@ -23,13 +23,16 @@ namespace Chart
       private InGameBeatSystem _beatSystem;
       private int _beatDelay = 4;
       private List<ChartController> _activeCharts = new List<ChartController>();
-      public void InGameInit(ChartSpawnerData data)
+      public void InGameInit(InGameBeatSystem beatSystem,ChartSpawnerData data, Canvas canvas,Image targetImage)
       {
          _chart = data.ChartPrefab;
          _defaultSize = data.DefaultSize;
          _maxSize = data.MaxSize;
-         _beatDelay = data.BeatDelay;
-         _targetImage = data.TargetImage;
+
+         _beatSystem = beatSystem;
+         
+         _targetImage = targetImage;
+         _canvas = canvas;
 
          BeatSyncDispatcher.Instance.RegisterBeatSync(this);
          BeatSyncDispatcher.Instance.RegisterBreak(this);
@@ -48,13 +51,12 @@ namespace Chart
             maxSize: _maxSize
          );
          _initialPosition = _chart.GetComponent<RectTransform>().anchoredPosition;
-         _beatSystem = BeatSyncDispatcher.Instance.Get<InGameBeatSystem>();
          _beatDelay = _beatSystem.BetweenBeats;
       }
 
       private ChartController InstantiateChart()
       {
-         var chart = Instantiate(_chart,_canvas.transform);
+         var chart = Instantiate(_chart, _canvas.transform);
          return chart;
       }
 
@@ -62,7 +64,7 @@ namespace Chart
       {
          chart.GetComponent<RectTransform>().anchoredPosition = _initialPosition;
          chart.gameObject.SetActive(true);
-         chart.Init(_targetImage.rectTransform,_beatInfo,_beatDelay);
+         chart.Init(_targetImage.rectTransform, _beatInfo, _beatDelay);
          chart.OnDeath += () => _chartImagePool.Release(chart);
          _activeCharts.Add(chart);
       }
@@ -104,9 +106,9 @@ namespace Chart
          BeatSyncDispatcher.Instance.UnregisterBeatSync(this);
       }
 
-        public void OnBreak()
-        {
-            HideChart();
-        }
-    }
+      public void OnBreak()
+      {
+         HideChart();
+      }
+   }
 }

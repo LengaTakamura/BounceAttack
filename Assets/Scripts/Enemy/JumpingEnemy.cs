@@ -6,15 +6,13 @@ using NaughtyAttributes;
 using Player;
 using UnityEngine;
 
-public class JumpingEnemy : EnemyBase,ITracking
+public class JumpingEnemy : EnemyBase, ITracking
 {
-    [SerializeField] private int _preparationBeat = 3;
-
     private CancellationTokenSource _cts;
-    [SerializeField, Label("攻撃の有効範囲")] private int _radius; 
+    [SerializeField, Label("攻撃の有効範囲")] private int _radius;
     [SerializeField] private LayerMask _playerLayerMask;
     [SerializeField] private int _delay = 10;
-    [SerializeField]private float _moveSpeed = 5f;
+    [SerializeField] private float _moveSpeed = 5f;
     private Func<Vector3> _targetPosition;
     public override void Init(BeatInfo beatinfo)
     {
@@ -43,11 +41,11 @@ public class JumpingEnemy : EnemyBase,ITracking
     private void CheckPlayer()
     {
         var array = new Collider[50];
-        var count = Physics.OverlapSphereNonAlloc(transform.position, _radius,array,_playerLayerMask);
-        if(count == 0) return;
+        var count = Physics.OverlapSphereNonAlloc(transform.position, _radius, array, _playerLayerMask);
+        if (count == 0) return;
         for (int i = 0; i < count; i++)
         {
-            if(!array[i].gameObject.TryGetComponent(out PlayerManager player)) continue;
+            if (!array[i].gameObject.TryGetComponent(out PlayerManager player)) continue;
             OnAttack(player);
         }
     }

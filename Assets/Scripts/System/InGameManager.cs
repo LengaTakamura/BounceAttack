@@ -1,5 +1,6 @@
 using Chart;
 using CriWare;
+using Cysharp.Threading.Tasks;
 using Player;
 using UI;
 using UnityEngine;
@@ -15,6 +16,7 @@ namespace System
         private PlayerManager _playerManager;
         private InputManager _inputManager;
         private UiView _uiView;
+        private PlayerMove _move;
 
         [SerializeField] private EnemyLineSpawner _lineSpawner;
         [SerializeField] private EnemySpawner _enemySpawner;
@@ -38,7 +40,7 @@ namespace System
         }
 
         /// <summary>
-        /// 最初のゲーム開始時の初期化処理
+        /// �Q�[���J�n���̏�����
         /// </summary>
         private void Init()
         {
@@ -47,6 +49,7 @@ namespace System
             _uiManager = new UiManager();
             _inputManager = new InputManager(_beatSystem);
             var player = Instantiate(_playerPrefab, _playerSpawnPoint.position, Quaternion.identity);
+            _move = player.GetComponent<PlayerMove>();
             _playerManager = player.GetComponent<PlayerManager>();
             _presenter = new Presenter(_playerManager, _uiManager, _inputManager);
             var ui = Instantiate(_inGameUiPrefab);
@@ -57,19 +60,26 @@ namespace System
 
         private void InitCommponents()
         {
-            _beatSystem.InGameInit(_beatSystemData);
             _soundManager.InGameInit(_criAtomSource, _soundData);
+            BeatSyncDispatcher.Instance.InGameInit(_beatSystem);
+            _beatSystem.InGameInit(_beatSystemData);
             _lineSpawner.InGameInit(_enemyLineSpawnerData);
-            _enemySpawner.InGameInit(_enemySpawnerData);
             _inputManager.InGameInit(_inputManagerData);
             _presenter.InGameInit(_uiView);
-            _chartSpawner.InGameInit(_chartSpawnerData);
-            _playerManager.InGameInit();
+            _chartSpawner.InGameInit(_beatSystem,_chartSpawnerData, _uiView.Canvas, _uiView.TargetImage);
+            _playerManager.InGameInit(_inputManager);
+            _enemySpawner.InGameInit(_playerManager, _enemySpawnerData);
         }
 
         void Update()
         {
             _inputManager?.OnUpdate();
+            _move?.OnUpdate();
+        }
+
+        void FixedUpdate()
+        {
+            _move?.OnFixedUpdate();
         }
 
         void OnDisable()
@@ -80,7 +90,5 @@ namespace System
             _inputManager?.Dispose();
             _presenter?.Dispose();
         }
-
-
     }
 }

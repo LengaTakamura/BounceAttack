@@ -1,20 +1,15 @@
 
+using System;
 using R3;
 
 namespace Novel
 {
-    public sealed class NovelPresenter
+    public sealed class NovelPresenter : IDisposable
     {
         private NovelInputManager _novelInputManager;
-
         private NovelUiManager _novelUiManager;
-
-
         public Observable<Unit> OnClicked;
-
-        private readonly CompositeDisposable _disposables = new();
-
-        public NovelPresenter(NovelInputManager novelInputManager,NovelUiManager novelUiManager)
+        public NovelPresenter(NovelInputManager novelInputManager, NovelUiManager novelUiManager)
         {
             _novelInputManager = novelInputManager;
             _novelUiManager = novelUiManager;
@@ -32,17 +27,16 @@ namespace Novel
             {
                 _novelInputManager.OnUpdate();
                 _novelUiManager.OnUpdate();
-            } 
+            }
         }
 
         public void Dispose()
         {
-            if (_disposables != null)
-            {
-                _disposables.Dispose();
-            }
+            _novelInputManager.Dispose();
+            _novelUiManager.Dispose();
+            OnClicked = null;
         }
-       
+
     }
 }
 

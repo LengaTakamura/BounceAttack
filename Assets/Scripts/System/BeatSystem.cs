@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace System
 {
-    public class InGameBeatSystem : IBeatSyncListener,IDisposable
+    public class InGameBeatSystem : IBeatSyncListener, IDisposable
     {
         private SoundManager _soundManager;
 
@@ -23,11 +23,11 @@ namespace System
         private bool _isWaiting;
         public bool IsWaiting { get { return _isWaiting; } }
 
-
         public InGameBeatSystem(SoundManager soundManager)
         {
             _soundManager = soundManager;
         }
+
         public void InGameInit(BeatSystemData beatSystemData)
         {
             _betweenBeats = beatSystemData.BetweenBeats;
@@ -42,14 +42,16 @@ namespace System
             BeatSyncDispatcher.Instance.RegisterBeatSync(this);
             Init().Forget();
         }
+
         private async UniTaskVoid Init()
         {
             CurrentTempo = TempoState.None;
             await UniTask.Delay(TimeSpan.FromSeconds(_waitingTime));
+
             _playback = _soundManager.PlayBgm();
-            if (!_playback.GetBeatSyncInfo(out CriAtomExBeatSync.Info info))
+            if (!_playback.GetBeatSyncInfo(out _))
             {
-                Debug.LogWarning("PlayBackから情報を取得できません");
+                Debug.LogWarning("BeatSync info could not be acquired from playback. Verify the selected cue has BeatSync settings.");
             }
         }
 
@@ -79,23 +81,23 @@ namespace System
 
             return copy;
         }
+
         private TempoState ChangeTempo(int count)
         {
-            if (count >= _changeTempoBeat + _betweenBeats - 1) return TempoState.Fast; // １テンポ目をとりやすくすためにー１
+            if (count >= _changeTempoBeat + _betweenBeats - 1) return TempoState.Fast;
             if (count >= _changeTempoBeat) return TempoState.PrevFast;
             if (count >= _changeTempoBeat - _betweenBeats)
             {
                 if (!_once)
                 {
                     BeatSyncDispatcher.Instance.NotifyBreak();
-                    Debug.Log("Break通知");
+                    Debug.Log("Break triggered");
                     _once = true;
                     return TempoState.None;
                 }
                 return TempoState.None;
-
             }
-            if (count >= _prepareBeat + _betweenBeats * 2 - 1) return TempoState.Normal; // 準備期間は長く １テンポ目をとりやすくすためにー１
+            if (count >= _prepareBeat + _betweenBeats * 2 - 1) return TempoState.Normal;
             if (count >= _prepareBeat) return TempoState.PrevNormal;
             return TempoState.None;
         }

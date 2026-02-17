@@ -9,10 +9,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f8b73c44a26e0c74cb15d4220cd96275, type: 3}
-  m_Name: BeatSystemData_01
+  m_Script: {fileID: 11500000, guid: 82e76bdcd8a23d64a879169acba3dc09, type: 3}
+  m_Name: ChartSpawnerData_01
   m_EditorClassIdentifier: 
-  prepareBeat: 5
-  BetweenBeats: 4
-  WaitingTime: 3
-  ChangeTempoBeat: 120
+  ChartPrefab: {fileID: 7558688724970675292, guid: 396dbb05e39026949a68956b08e347d0, type: 3}
+  TargetImage: {fileID: 0}
+  BeatDelay: 4
+  DefaultSize: 10
+  MaxSize: 20

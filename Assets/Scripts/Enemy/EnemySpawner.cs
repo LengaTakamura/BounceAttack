@@ -23,9 +23,9 @@ public class EnemySpawner : MonoBehaviour, IBeatSyncListener,IBreakListener
     private Action _OnFixedUpdateAction;
     private Action _OnUpdateAction;
     private List<EnemyBase> _activeEnemies = new List<EnemyBase>();
-    [SerializeField] private PlayerManager _player;
+    private PlayerManager _player;
 
-    public void InGameInit(EnemySpawnerData data)
+    public void InGameInit(PlayerManager playerManager , EnemySpawnerData data)
     {
         _enemyList = data.EnemyPrefabs;
         _defaultSize = data.DefaultSize;
@@ -33,6 +33,8 @@ public class EnemySpawner : MonoBehaviour, IBeatSyncListener,IBreakListener
         _spawnInterval = data.SpawnInterval;
         _minSpawnCount = data.MinSpawnCount;
         _maxSpawnCount = data.MaxSpawnCount;
+
+        _player = playerManager;
 
         BeatSyncDispatcher.Instance.RegisterBeatSync(this);
         BeatSyncDispatcher.Instance.RegisterBreak(this);
