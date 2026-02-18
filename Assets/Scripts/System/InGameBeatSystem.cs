@@ -91,7 +91,6 @@ namespace System
                 if (!_once)
                 {
                     BeatSyncDispatcher.Instance.NotifyBreak();
-                    Debug.Log("Break triggered");
                     _once = true;
                     return TempoState.None;
                 }

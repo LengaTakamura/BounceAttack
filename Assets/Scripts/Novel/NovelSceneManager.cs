@@ -50,7 +50,7 @@ public class NovelSceneManager : MonoBehaviour
     }
     private async void SceneChange()
     {
-        await GameSystem.Instance.SceneChange("Stage1");
+        await GameSystem.Instance.ChangeScene("Stage1");
     }
 
 }

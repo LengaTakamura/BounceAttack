@@ -54,6 +54,7 @@ public class SphereEnemy : EnemyBase, ITracking
         {
             if(!array[i].gameObject.TryGetComponent(out PlayerManager player)) continue;
             OnAttack(player);
+            break;
         }
     }
 

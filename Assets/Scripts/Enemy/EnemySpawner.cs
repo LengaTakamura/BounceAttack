@@ -57,7 +57,12 @@ public class EnemySpawner : MonoBehaviour, IBeatSyncListener,IBreakListener
 
     private void DestroyEnemy(EnemyBase enemyBase)
     {
-        Destroy(enemyBase.gameObject);
+        if (enemyBase == null) return;
+
+        if (enemyBase.gameObject != null)
+        {
+            Destroy(enemyBase.gameObject);
+        }
     }
 
     private void ReleaseEnemy(EnemyBase enemyBase)

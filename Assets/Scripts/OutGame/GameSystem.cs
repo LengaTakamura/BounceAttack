@@ -20,7 +20,7 @@ public class GameSystem : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
-    public async UniTask SceneChange(string sceneName)
+    public async UniTask ChangeScene(string sceneName)
     {
         await SceneManager.LoadSceneAsync(sceneName).ToUniTask();
     }

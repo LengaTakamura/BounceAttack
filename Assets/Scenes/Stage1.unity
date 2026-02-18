@@ -248,6 +248,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _groundPrefab: {fileID: 987728763}
+  _yOffset: 1.5
 --- !u!4 &201603691
 Transform:
   m_ObjectHideFlags: 0
@@ -1345,8 +1346,10 @@ MonoBehaviour:
   _enemySpawnerData: {fileID: 11400000, guid: 45c9bdf71c8c18e4e984533428c27472, type: 2}
   _inputManagerData: {fileID: 11400000, guid: c8068640220b59e46adb761d2c02c829, type: 2}
   _chartSpawnerData: {fileID: 11400000, guid: 3f16384bccb279f4ca791e68ff875901, type: 2}
+  _scoreData: {fileID: 11400000, guid: e50bdd1550cab804f9e6239226295423, type: 2}
   _criAtomSource: {fileID: 1737870885}
   _playerSpawnPoint: {fileID: 504417885}
+  _cinemachineCamera: {fileID: 2012188737}
 --- !u!4 &1684804113
 Transform:
   m_ObjectHideFlags: 0
@@ -1596,6 +1599,7 @@ SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 1339626853}
+  - {fileID: 2012188738}
   - {fileID: 1555907977}
   - {fileID: 232897877}
   - {fileID: 987728765}
@@ -1608,6 +1612,5 @@ SceneRoots:
   - {fileID: 201603691}
   - {fileID: 1132825104}
   - {fileID: 836452502}
-  - {fileID: 2012188738}
   - {fileID: 777800169}
   - {fileID: 1737870886}
