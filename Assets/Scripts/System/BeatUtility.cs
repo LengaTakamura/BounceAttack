@@ -1,11 +1,6 @@
 using System;
-using UnityEditor.Build.Reporting;
-using UnityEngine;
-
 public static class BeatUtility
 {
-    
-    
     /// <summary>
     /// Beatに現在のタイミングがどれだけ近いかをTypeで返す
     /// divideBeatでBPMを減らす場合、時間の更新も併せて減らして下さい
