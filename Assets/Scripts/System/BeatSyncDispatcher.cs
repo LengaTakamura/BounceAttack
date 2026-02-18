@@ -28,7 +28,6 @@ namespace System
 
         public void InGameInit(InGameBeatSystem beatSystem)
         {
-            Debug.Log("INIT");
             _ingameBeatSystem = beatSystem;
             CriAtomExBeatSync.OnCallback += ListenersOnBeat;
             _isInGame = true;
@@ -110,7 +109,6 @@ namespace System
 
         private void ListenersOnBeat(ref CriAtomExBeatSync.Info info)
         {
-            Debug.Log("ONBEAT");
             if (_isInGame)
             {
                 var beatInfo = _ingameBeatSystem.UpdateInfo(info); //情報の更新
