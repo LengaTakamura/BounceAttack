@@ -61,6 +61,7 @@ namespace Enemy
         }
         private void OnDisable()
         {
+            _seq?.Kill();
             _cts?.Cancel();
             _cts?.Dispose();
         }

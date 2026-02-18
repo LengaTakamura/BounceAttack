@@ -7,7 +7,7 @@ public class EnemyLineSpawner : MonoBehaviour, IBeatSyncListener, IBreakListener
 {
     //todo: 生成、破壊処理を外部に移す事でMonobehaviourから切り離すことができるかもしれないが、
     // Groundのサイズ等のSpawnerに依存する要素もあるため、現状はMonobehaviourのままにしている
-    [SerializeField]private Renderer _groundPrefab;
+    [SerializeField] private Renderer _groundPrefab;
     [SerializeField] private float _yOffset;
     private int _lineCount;
     private ObjectPool<EnemyBase> _pool;
@@ -54,7 +54,12 @@ public class EnemyLineSpawner : MonoBehaviour, IBeatSyncListener, IBreakListener
 
     private void DestroyEnemy(EnemyBase enemyBase)
     {
-        Destroy(enemyBase.gameObject);
+        if (enemyBase == null) return;
+
+        if (enemyBase.gameObject != null)
+        {
+            Destroy(enemyBase.gameObject);
+        }
     }
 
     private void ReleaseEnemy(EnemyBase enemyBase)
