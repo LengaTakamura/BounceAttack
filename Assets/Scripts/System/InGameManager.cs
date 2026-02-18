@@ -1,10 +1,11 @@
 using Chart;
 using CriWare;
-using Cysharp.Threading.Tasks;
 using Player;
 using UI;
 using Unity.Cinemachine;
 using UnityEngine;
+using R3;
+using Cysharp.Threading.Tasks;
 
 namespace System
 {
@@ -32,10 +33,13 @@ namespace System
         [SerializeField] private EnemySpawnerData _enemySpawnerData;
         [SerializeField] private InputManagerData _inputManagerData;
         [SerializeField] private ChartSpawnerData _chartSpawnerData;
+        [SerializeField] private ScoreData _scoreData;
         [SerializeField] private CriAtomSource _criAtomSource;
         [SerializeField] private Transform _playerSpawnPoint;
         [SerializeField] private CinemachineCamera _cinemachineCamera;
+        [SerializeField] private int _delay = 10;
 
+        private CompositeDisposable _disposables = new();
         private void OnEnable()
         {
             Init();
@@ -54,7 +58,7 @@ namespace System
             _move = player.GetComponent<PlayerMove>();
             _playerManager = player.GetComponent<PlayerManager>();
             _cinemachineCamera.Target.TrackingTarget = player.transform;
-            _presenter = new Presenter(_playerManager, _uiManager, _inputManager);
+            _presenter = new Presenter(_playerManager, _uiManager, _inputManager,_scoreData);
             var ui = Instantiate(_inGameUiPrefab);
             _uiView = ui.GetComponent<UiView>();
 
@@ -72,11 +76,13 @@ namespace System
             _presenter.InGameInit(_uiView);
             _chartSpawner.InGameInit(_beatSystem,_chartSpawnerData, _uiView.Canvas, _uiView.TargetImage);
             _enemySpawner.InGameInit(_playerManager, _enemySpawnerData);
+
+            _playerManager.OnDeath.Subscribe(_ => Result()).AddTo(_disposables);
         }
 
         void Update()
         {
-            _inputManager?.OnUpdate();
+            _inputManager?.OnUpdate(_playerManager.IsDead);
             _move?.OnUpdate();
         }
 
@@ -85,8 +91,16 @@ namespace System
             _move?.OnFixedUpdate();
         }
 
+        private async void Result()
+        {
+            await UniTask.Delay(TimeSpan.FromSeconds(_delay));
+            BeatSyncDispatcher.Instance.Clear();
+            await GameSystem.Instance.ChangeScene("Novel");
+        }
+
         void OnDisable()
         {
+            _disposables?.Dispose();
             _beatSystem?.Dispose();
             _soundManager?.Dispose();
             _uiManager?.Dispose();
