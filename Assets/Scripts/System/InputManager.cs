@@ -41,9 +41,10 @@ namespace System
             _data = data;
         }
 
-        public void OnUpdate()
+        public void OnUpdate(bool isDead)
         {
             CurrentInputType = GetInputType();
+            if(isDead) return;
             if(_beatSystem.IsWaiting) return;
             InputHandler();
         }
@@ -83,7 +84,7 @@ namespace System
             }
         }
         
-        private void AddScore(int amount)
+        public void AddScore(int amount)
         {
             _currentScore.Value += amount;
             _scoreChanged.OnNext(amount);
