@@ -69,20 +69,6 @@ namespace System
         }
         public void ClearBeatSync() => _listeners.Clear();
 
-        public T Get<T>() where T : class, IBeatSyncListener
-        {
-            foreach (var listener in _listeners)
-            {
-                if (listener is T tListener)
-                {
-                    return tListener;
-                    // クラスでありIBeatSyncListenerを継承しているTを探してTを返す
-                }
-            }
-
-            return null;
-        }
-
         public void UnregisterBeatSync(IBeatSyncListener listener, IBreakListener breakable = null)
         {
             if (_listeners.Contains(listener))
