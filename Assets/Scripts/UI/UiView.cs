@@ -9,7 +9,6 @@ public class UiView : MonoBehaviour
    [SerializeField] private Canvas _canvas;
    [SerializeField] private Image _targetImage;
 
-
    public Canvas Canvas => _canvas; 
    public Image TargetImage => _targetImage;
    public List<UiBase> UiObjects => _uiObjects;
